@@ -90,7 +90,7 @@ C-----------------------------------------------
       numargs = iargc()
       call getarg(1,arg1)
       if( numargs.ne.1 )then
-        print *,' MUST ENTER FILE SUFFIX ON COMMAND LINES'
+        print *,' MUST ENTER FILE SUFFIX ON COMMAND LINE'
         stop
       endif
       if(surf_compute) then

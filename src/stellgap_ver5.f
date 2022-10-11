@@ -409,9 +409,6 @@ c     cos(k*x)*sin(i*x)*sin(j*x)
 c     for x running from 0 to 2*PI.
 c     The value returned is actually (2/PI) times this integral.
 c
-      ! write(*,'("HOLA")')
-      ! prec: ", i4, "ran: ", i4)'), precision(one)
-      ! >     range(one)
       result = zero
       if(i .eq. 0 .or. j .eq. 0) return
       if(k .eq. 0) then
