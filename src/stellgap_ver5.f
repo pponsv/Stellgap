@@ -409,6 +409,9 @@ c     cos(k*x)*sin(i*x)*sin(j*x)
 c     for x running from 0 to 2*PI.
 c     The value returned is actually (2/PI) times this integral.
 c
+      ! write(*,'("HOLA")')
+      ! prec: ", i4, "ran: ", i4)'), precision(one)
+      ! >     range(one)
       result = zero
       if(i .eq. 0 .or. j .eq. 0) return
       if(k .eq. 0) then
@@ -518,6 +521,7 @@ c
       read(arg1,'(i3)') irads
       read(arg2,'(i4)') ir_fine_scl
       irad3 = 3*irads
+      
       write(*,'("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)')
      >       irads, irad3, ir_fine_scl
      
