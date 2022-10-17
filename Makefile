@@ -1,10 +1,10 @@
 all: build link
 
 clean:
-	cd ./src && $(MAKE) clean
+	$(MAKE) -C ./src/ clean
 
 build:
-	cd ./src && $(MAKE) all
+	$(MAKE) -C ./src/ all
 	
 link:
 	mkdir -p $${HOME}/.local/bin/
