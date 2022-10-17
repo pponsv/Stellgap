@@ -1,15 +1,16 @@
-LIBSTELL  = $${HOME}/bin/libstell_dir/
-METRIC    = metric_element_create_ver8.46
-NOSOUND   = stellgap_ver5
-SOUND     = stellgap_soundwave_lagrng_ver7
-SERIAL    = SERIAL # PARALLEL or SERIAL
+BUILDPATH   = ../bin/
 
-MKLFLAGS  = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm
-PREPFLAGS = -cpp -P -C -D$(SERIAL)
-GFLAGS    = -O2 -ffixed-form
-OFILES    = fitpack.o Fourier_lib_convolve.o fourier_lib.o
+LIBSTELL    = $${HOME}/bin/libstell_dir/
+METRIC      = metric_element_create_ver8.46
+NOSOUND     = stellgap_ver5
+SOUND       = stellgap_soundwave_lagrng_ver7
+SERIAL      = SERIAL # PARALLEL or SERIAL
 
-BUILDPATH = ../bin/
+MKLFLAGS    = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm 
+METRICFLAGS = -L$(LIBSTELL) -lstell -lnetcdf -llapack -lblas # To compile xmetric
+PREPFLAGS   = -cpp -P -C -D$(SERIAL) # For preprocessing
+GFLAGS      = -O2 -ffixed-form
+OFILES      = fitpack.o Fourier_lib_convolve.o fourier_lib.o
 
 all: makebin $(BUILDPATH)xmetric $(BUILDPATH)xstgap $(BUILDPATH)xstgap_snd
 
@@ -36,7 +37,7 @@ metric.o: $(METRIC).f
 	gfortran $(GFLAGS) -c $(METRIC).f -I$(LIBSTELL) -o metric.o
 
 $(BUILDPATH)xmetric: metric.o
-	gfortran -O2  metric.o $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas \
+	gfortran -O2 metric.o $(METRICFLAGS) \
 		-o $(BUILDPATH)xmetric
 
 $(BUILDPATH)xstgap_snd: $(OFILES) $(SOUND).f
