@@ -11,10 +11,14 @@ OFILES    = fitpack.o Fourier_lib_convolve.o fourier_lib.o
 
 BUILDPATH = ../bin/
 
-all: xmetric xstgap xstgap_snd
+all: makebin $(BUILDPATH)xmetric $(BUILDPATH)xstgap $(BUILDPATH)xstgap_snd
+
+makebin:
+	mkdir -p $(BUILDPATH)
 
 clean:
 	rm -f *.mod *.o
+	rm -f ../bin/*
 
 kind_spec.o: kind_spec.f
 	gfortran $(GFLAGS) -c kind_spec.f
@@ -31,14 +35,14 @@ Fourier_lib_convolve.o: Fourier_lib_convolve.f fourier_lib.o fitpack.o
 metric.o: $(METRIC).f
 	gfortran $(GFLAGS) -c $(METRIC).f -I$(LIBSTELL) -o metric.o
 
-xmetric: metric.o
+$(BUILDPATH)xmetric: metric.o
 	gfortran -O2  metric.o $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas \
 		-o $(BUILDPATH)xmetric
 
-xstgap_snd: $(OFILES) $(SOUND).f
+$(BUILDPATH)xstgap_snd: $(OFILES) $(SOUND).f
 	gfortran $(PREPFLAGS) $(GFLAGS) $(SOUND).f -I. $(MKLFLAGS) $(OFILES) \
 		-o $(BUILDPATH)xstgap_snd
 		
-xstgap: $(OFILES) $(NOSOUND).f
+$(BUILDPATH)xstgap: $(OFILES) $(NOSOUND).f
 	gfortran $(PREPFLAGS) $(GFLAGS) $(NOSOUND).f -I. $(MKLFLAGS) $(OFILES) \
 		-o $(BUILDPATH)xstgap

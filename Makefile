@@ -1,16 +1,14 @@
-all:
-	cd ./src && $(MAKE) all
-	mkdir -p ./bin/
-	mv ./src/x* ./bin/
-	$(MAKE) link
+all: build link
 
 clean:
-	rm -f ./bin/*
 	cd ./src && $(MAKE) clean
+
+build:
+	cd ./src && $(MAKE) all
 	
 link:
 	mkdir -p $${HOME}/.local/bin/
-	ln -r -sf ./bin/* $${HOME}/.local/bin/
+	ln -r -sf ./bin/x* $${HOME}/.local/bin/
 	
 rmlink:
 	rm ~/.local/bin/xstgap
