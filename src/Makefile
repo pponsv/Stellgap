@@ -1,41 +1,44 @@
-LIBSTELL = $${HOME}/bin/libstell_dir/
-METRIC   = metric_element_create_ver8.46
-NOSOUND  = stellgap_ver5
-SOUND    = stellgap_soundwave_lagrng_ver7
+LIBSTELL  = $${HOME}/bin/libstell_dir/
+METRIC    = metric_element_create_ver8.46
+NOSOUND   = stellgap_ver5
+SOUND     = stellgap_soundwave_lagrng_ver7
+SERIAL    = SERIAL # PARALLEL or SERIAL
 
-MKLFLAGS = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm
+MKLFLAGS  = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm
+PREPFLAGS = -cpp -P -C -D$(SERIAL)
+GFLAGS    = -O2 -ffixed-form
+OFILES    = fitpack.o Fourier_lib_convolve.o fourier_lib.o
 
-all: clean nosound sound metric 
+BUILDPATH = ../bin/
 
-auxfiles:
-	gfortran -O2 -ffixed-form -c fitpack.f
-	gfortran -O2 -ffixed-form -c Fourier_lib_convolve.f
-	
-metric:
-	@printf "\nBuilding metric... \n\n"
-	gfortran -O2 -c $(METRIC).f -I$(LIBSTELL)
-	gfortran -O2 -o xmetric $(METRIC).o -I$(LIBSTELL) $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas
-		
-nosound:
-	@printf "\nBuilding nosound... \n\n"
-	gfortran -cpp -E -P -C -DSERIAL $(NOSOUND).f > stellgap.f
-	gfortran -O2 -ffixed-form -c stellgap.f
-	$(MAKE) auxfiles
-	gfortran -O2 -ffixed-form -o xstgap -I. stellgap.o $(MKLFLAGS) fitpack.o Fourier_lib_convolve.o
-	rm stellgap.f
-	
-sound: 
-	@printf "\nBuilding sound... \n\n"
-	gfortran -cpp -E -P -C -DSERIAL $(SOUND).f > stellgap_snd.f
-	gfortran -O2 -ffixed-form -c stellgap_snd.f
-	$(MAKE) auxfiles
-	gfortran -O2 -ffixed-form -o xstgap_snd -I. stellgap_snd.o $(MKLFLAGS) fitpack.o Fourier_lib_convolve.o
-	rm stellgap_snd.f
+all: xmetric xstgap xstgap_snd
 
 clean:
-	@printf "\nCleaning... \n\n"
-	-rm -r *.o *.mod x*
+	rm -f *.mod *.o
 
-silo:
-	# It does not work and I don't need it so I won't even try
-	@printf "Building silo... \n\n"
+kind_spec.o: kind_spec.f
+	gfortran $(GFLAGS) -c kind_spec.f
+
+fourier_lib.o: fourier_lib.f kind_spec.o
+	gfortran $(GFLAGS) -c fourier_lib.f
+
+fitpack.o: fitpack.f kind_spec.o
+	gfortran $(GFLAGS) -c fitpack.f
+
+Fourier_lib_convolve.o: Fourier_lib_convolve.f fourier_lib.o fitpack.o
+	gfortran $(GFLAGS) -c Fourier_lib_convolve.f
+
+metric.o: $(METRIC).f
+	gfortran $(GFLAGS) -c $(METRIC).f -I$(LIBSTELL) -o metric.o
+
+xmetric: metric.o
+	gfortran -O2  metric.o $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas \
+		-o $(BUILDPATH)xmetric
+
+xstgap_snd: $(OFILES) $(SOUND).f
+	gfortran $(PREPFLAGS) $(GFLAGS) $(SOUND).f -I. $(MKLFLAGS) $(OFILES) \
+		-o $(BUILDPATH)xstgap_snd
+		
+xstgap: $(OFILES) $(NOSOUND).f
+	gfortran $(PREPFLAGS) $(GFLAGS) $(NOSOUND).f -I. $(MKLFLAGS) $(OFILES) \
+		-o $(BUILDPATH)xstgap

@@ -5,6 +5,7 @@ all:
 	$(MAKE) link
 
 clean:
+	rm -f ./bin/*
 	cd ./src && $(MAKE) clean
 	
 link:
