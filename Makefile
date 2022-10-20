@@ -4,7 +4,7 @@ all: build link
 
 debug: clean all
 
-clean:
+clean: rmlink
 	@$(MAKE) -C ./src/ clean
 
 build:
