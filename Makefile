@@ -1,12 +1,14 @@
+.PHONY: all build link clean debug rmlink
+
 all: build link
 
 debug: clean all
 
 clean:
-	$(MAKE) -C ./src/ clean
+	@$(MAKE) -C ./src/ clean
 
 build:
-	$(MAKE) -C ./src/ all
+	@$(MAKE) -C ./src/ all
 	
 link:
 	mkdir -p $${HOME}/.local/bin/

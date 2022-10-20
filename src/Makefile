@@ -11,26 +11,29 @@ METRICFLAGS = $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas # To compile xmetr
 PREPFLAGS   = -cpp -P -C -D$(SERIAL) # For preprocessing
 GFLAGS      = -O2 -ffixed-form
 OFILES      = fitpack.o Fourier_lib_convolve.o fourier_lib.o
+MODFILES    = fourier_lib.mod kind_spec.mod
 
-all: makebin $(BUILDPATH)xmetric $(BUILDPATH)xstgap $(BUILDPATH)xstgap_snd
+.PHONY: all clean
 
-makebin:
+all: $(BUILDPATH) $(BUILDPATH)xmetric $(BUILDPATH)xstgap $(BUILDPATH)xstgap_snd
+
+$(BUILDPATH):
 	mkdir -p $(BUILDPATH)
 
 clean:
 	rm -f *.mod *.o
 	rm -f ../bin/*
 
-kind_spec.o: kind_spec.f
+kind_spec.o kind_spec.mod: kind_spec.f
 	gfortran $(GFLAGS) -c kind_spec.f
 
-fourier_lib.o: fourier_lib.f kind_spec.o
+fourier_lib.o fourier_lib.mod: fourier_lib.f kind_spec.o
 	gfortran $(GFLAGS) -c fourier_lib.f
 
-fitpack.o: fitpack.f kind_spec.o
+fitpack.o: fitpack.f kind_spec.o kind_spec.mod
 	gfortran $(GFLAGS) -c fitpack.f
 
-Fourier_lib_convolve.o: Fourier_lib_convolve.f fourier_lib.o fitpack.o
+Fourier_lib_convolve.o: Fourier_lib_convolve.f fourier_lib.o fitpack.o fourier_lib.mod
 	gfortran $(GFLAGS) -c Fourier_lib_convolve.f
 
 metric.o: $(METRIC).f
@@ -39,8 +42,8 @@ metric.o: $(METRIC).f
 $(BUILDPATH)xmetric: metric.o
 	gfortran $(GFLAGS) metric.o $(METRICFLAGS) -o $@
 
-$(BUILDPATH)xstgap_snd: $(OFILES) $(SOUND).f
+$(BUILDPATH)xstgap_snd: $(OFILES) $(MODFILES) $(SOUND).f
 	gfortran $(PREPFLAGS) $(GFLAGS) $(SOUND).f $(MKLFLAGS) $(OFILES) -o $@
 		
-$(BUILDPATH)xstgap: $(OFILES) $(NOSOUND).f
+$(BUILDPATH)xstgap: $(OFILES) $(MODFILES) $(NOSOUND).f
 	gfortran $(PREPFLAGS) $(GFLAGS) $(NOSOUND).f $(MKLFLAGS) $(OFILES) -o $@
