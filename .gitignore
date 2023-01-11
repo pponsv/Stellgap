@@ -27,3 +27,7 @@
 *.out
 *.app
 x*
+
+# Folders
+bld/
+bin/
