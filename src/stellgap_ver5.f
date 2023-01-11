@@ -122,6 +122,7 @@ c-----------------------------------------------------------------
       program tae_continua
       use fourier_lib
       use kind_spec
+      use postprocess
       implicit none
 #if defined (PARALLEL)      
       include 'mpif.h'
@@ -703,5 +704,6 @@ c
 #if defined (PARALLEL)      
         call MPI_FINALIZE(ier)
 #endif
+      call post_process
       stop
       end program tae_continua

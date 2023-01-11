@@ -9,7 +9,7 @@ METRIC   = metric_element_create_ver8.46
 NOSOUND  = stellgap_ver5
 SOUND    = stellgap_soundwave_lagrng_ver7
 SERIAL   = SERIAL # PARALLEL or SERIAL
-OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o
+OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o post_process.o
 OFILES   = $(patsubst %, $(BLD)/%, $(OFILES_i))
 
 #	Flags
@@ -55,6 +55,8 @@ $(BLD)/%.o : $(SRC)/%.f
 $(BLD)/fourier_lib.o: $(BLD)/kind_spec.o
 
 $(BLD)/fitpack.o: $(BLD)/kind_spec.o
+
+$(BLD)/post_process.o: $(BLD)/kind_spec.o
 
 $(BLD)/Fourier_lib_convolve.o: $(BLD)/fourier_lib.o $(BLD)/fitpack.o
 
