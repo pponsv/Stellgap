@@ -140,7 +140,8 @@ c
       real(kind=rprec), parameter :: mass_proton = 1.67d-27
       real(kind=rprec) :: ion_density_0, mass_ion, ion_to_proton_mass,
      1   aion, bion, cion
-      real(kind=rprec) :: nion(10)
+c     Telec does nothing, added for compat. with sound version
+      real(kind=rprec) :: nion(10), telec(10) 
       integer :: ir, irr, il, iu, ion_profile
       character*4 :: egnout_form
       logical :: jdqz_data
@@ -195,7 +196,7 @@ c
       character*10 arg1, arg2
       integer values(8)
       namelist /plasma_input/ ion_to_proton_mass, ion_density_0,
-     >    ion_profile, jdqz_data, egnout_form, nion,
+     >    ion_profile, jdqz_data, egnout_form, nion, telec,
      >    aion, bion, cion
       cyl = .false.; lrfp = .false.
       call getarg(1,arg1)
