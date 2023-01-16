@@ -217,8 +217,10 @@ c
       allocate(yp(irad3),temp(irad3),ypi(irad3),
      >  tempi(irad3), stat=istat) 
       
+      nion = 0.   ! Initialize to avoid random values if input too short
       open(unit=4,file="plasma.dat",status="old")
       read(4,plasma_input)
+      print *, "NION", nion
       close(unit=4)
       mass_ion = mass_proton*ion_to_proton_mass
 #if defined (PARALLEL)      

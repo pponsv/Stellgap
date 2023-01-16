@@ -256,10 +256,13 @@ c  Defaults
      >  yp(irads), temp(irads), ypi(irads), tempi(irads),
      >  ypjt(irads), ypjp(irads), ypphp(irads), stat=istat)
       
+      nion=0. ! To initialize (avoid random values if input too short)
       telec(1) = 1.
       telec(2:10) = 0.
       open(unit=4,file="plasma.dat",status="old")
       read(4,plasma_input)
+      print *, "NION:", nion
+      print *, "TELEC:", telec
       close(unit=4)
       mass_ion = mass_proton*ion_to_proton_mass
 #if defined (PARALLEL)      
