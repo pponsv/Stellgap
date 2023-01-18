@@ -119,6 +119,7 @@
 !-----------------------------------------------------------------
 program tae_continua
    use fourier_lib
+   use Fourier_lib_convolve
    use kind_spec
    use postprocess
    use fitpack
@@ -919,7 +920,7 @@ program tae_continua
       do i = 1, izt
          do j = 1, ith
             f1(i, j) = mu0*rho_ion(ir)*gsssup_lrg(i, j, ir)&
-                      &*rjacob_lrg(i, j, ir)/(bfield_lrg(i, j, ir)**2)
+            &*rjacob_lrg(i, j, ir)/(bfield_lrg(i, j, ir)**2)
             f1_avg = f1_avg + f1(i, j)/real(izt*ith)
             f3c(i, j) = gsssup_lrg(i, j, ir)/&
             &(rjacob_lrg(i, j, ir)*(bfield_lrg(i, j, ir)**2))
