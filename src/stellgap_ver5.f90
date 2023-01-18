@@ -123,6 +123,7 @@ program tae_continua
    use fourier_lib
    use kind_spec
    use postprocess
+   use fitpack
    implicit none
 #if defined (PARALLEL)
    include 'mpif.h'
@@ -169,7 +170,7 @@ program tae_continua
    &phipc, rho, sp_fit, b2, iotac_inv
 
    real(kind=rprec) :: sp1, sp2, sigma_spl, r_pt,&
-   &iotac_r, curv2, dum1, dum2, dum3, dum4
+   &iotac_r, dum1, dum2, dum3, dum4
 
    real(kind=rprec), dimension(:), allocatable :: yp, temp,&
    &ypi, tempi

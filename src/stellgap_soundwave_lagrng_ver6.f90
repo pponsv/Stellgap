@@ -121,6 +121,7 @@ program tae_continua
    use fourier_lib
    use kind_spec
    use postprocess
+   use fitpack
    implicit none
 #if defined (PARALLEL)
    include 'mpif.h'
@@ -187,7 +188,7 @@ program tae_continua
    &psi_temp0(:), psi_temp1(:), phi_norm(:), psi_norm(:)
    complex*16, allocatable :: alpha(:)
    real(kind=rprec) :: sp1, sp2, sigma_spl, r_pt,&
-   &iotac_r, curv2, ra, ra2, ra3, ra4, ra5, ra6
+   &iotac_r, ra, ra2, ra3, ra4, ra5, ra6
    real(kind=rprec) :: amat1, amat2, amat3, amat4, amat5
    real(kind=rprec) :: f1_coef, f2a_coef, f3a_coef,&
    &f3b_coef, f3c_coef, ftest

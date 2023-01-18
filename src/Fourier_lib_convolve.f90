@@ -1,5 +1,6 @@
 subroutine toFourier
    use fourier_lib
+   use fitpack
    implicit none
 !
 !   Do Fourier transform integrations needed to convert data on a
