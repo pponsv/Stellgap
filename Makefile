@@ -13,7 +13,8 @@ OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o post_process.o
 OFILES   = $(patsubst %, $(BLD)/%, $(OFILES_i))
 
 #	Flags
-MKLFLAGS    = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm 
+# MKLFLAGS    = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm
+MKLFLAGS    = -llapack -lm -lblas -lpthread
 METRICFLAGS = $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas # To compile xmetric
 PREPFLAGS   = -cpp -P -C -D$(SERIAL) # For preprocessing
 GFLAGS      = -O2 -ffixed-form -J$(BLD)
@@ -46,7 +47,7 @@ $(BIN)/xstgap_snd: $(SRC)/$(SOUND).f $(OFILES)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 		
 $(BIN)/xstgap: $(SRC)/$(NOSOUND).f $(OFILES)
-	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS)-o $@
+	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 
 $(BLD)/%.o : $(SRC)/%.f
 	gfortran $(GFLAGS) -c $< -o $@

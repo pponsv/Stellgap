@@ -134,6 +134,7 @@ c      The Fourier xform is done by subroutine toFourier using
 c      cos/sin expansions. (use with Fourier_lib.f)
 c
 c
+      external dggev, dsygv, dsygvx
       integer :: ir_fine_scl, irads, irad3
       integer, parameter :: iopt = 1
       real(kind=rprec), parameter :: R0 = 1.0

@@ -143,6 +143,7 @@ c
 c
 c
 c
+      external dggev, dsygv, dsygvx, dgemv
       integer :: ir_fine_scl, irads, irad3
 c      integer, parameter :: ir_fine_scl = 256
       integer, parameter :: ir_out = 12800
