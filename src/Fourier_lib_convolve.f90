@@ -31,7 +31,7 @@ contains
       end if
 !
       return
-   end
+   end subroutine toFourier
 !
    subroutine old_toFourier
       real(kind=rprec) dum, dnorm
@@ -60,7 +60,7 @@ contains
       end do
 !
       return
-   end
+   end subroutine old_toFourier
 !
    subroutine toReal
 !
@@ -78,7 +78,7 @@ contains
             end if
          end do
       end do
-   end
+   end subroutine toReal
 !
 !
 !
@@ -101,7 +101,7 @@ contains
       else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
          sin_type = 1; cos_type = 0
       end if
-   end
+   end subroutine dbydth
 !
 !
 !
@@ -124,6 +124,6 @@ contains
       else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
          sin_type = 1; cos_type = 0
       end if
-   end
+   end subroutine dbydzt
 
 end module Fourier_lib_convolve
