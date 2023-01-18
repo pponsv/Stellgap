@@ -17,7 +17,7 @@ OFILES   = $(patsubst %, $(BLD)/%, $(OFILES_i))
 MKLFLAGS    = -llapack -lm -lblas -lpthread
 METRICFLAGS = $(LIBSTELL)libstell.so -lnetcdf -llapack -lblas # To compile xmetric
 PREPFLAGS   = -cpp -P -C -D$(SERIAL) # For preprocessing
-GFLAGS      = -O2 -ffixed-form -J$(BLD)
+GFLAGS      = -O2 -ffree-form -J$(BLD)
 
 .PHONY: all build link clean debug rmlink
 
@@ -40,16 +40,20 @@ rmlink:
 	rm -f ~/.local/bin/xmetric
 
 #	Compilation
-$(BIN)/xmetric: $(SRC)/$(METRIC).f
+$(BIN)/xmetric: $(SRC)/$(METRIC).f90
 	gfortran $(GFLAGS) -I $(LIBSTELL) $^ $(METRICFLAGS) -o $@
 
-$(BIN)/xstgap_snd: $(SRC)/$(SOUND).f $(OFILES)
+$(BIN)/xstgap_snd: $(SRC)/$(SOUND).f90 $(OFILES)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 		
+<<<<<<< HEAD
 $(BIN)/xstgap: $(SRC)/$(NOSOUND).f $(OFILES)
+=======
+$(BIN)/xstgap: $(SRC)/$(NOSOUND).f90 $(OFILES)
+>>>>>>> 0a98fc9 (Reformatted fixed form to free form)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 
-$(BLD)/%.o : $(SRC)/%.f
+$(BLD)/%.o : $(SRC)/%.f90
 	gfortran $(GFLAGS) -c $< -o $@
 
 #	Dependencies
