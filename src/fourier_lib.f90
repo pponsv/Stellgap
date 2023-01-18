@@ -3,18 +3,23 @@
 !   ith, izt, nfp, mpol, ntor, mp_col, nt_col, mode_family, tokamak
 !
 module fourier_lib
+
    use kind_spec
+   use input, only: &
+      ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family, &
+      nw, mwl, mwu
+
    implicit none
-   integer::ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family
-   real(kind=rprec), parameter :: parity_gss = 1.,&
-   &parity_bsupth = 1., parity_bsupzt = 1.
+
+   ! integer :: ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family
+   real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
    integer :: i, j, lg, nu, nl, m, n, mn, istat, sin_type, cos_type
 !   Equilibrium coefficient arrays
-   real(kind=rprec), allocatable :: thtgrd(:), ztgrd(:), rn(:), rm(:)
-   real(kind=rprec), allocatable :: fnm(:), f(:), anm(:)
-   real(kind=rprec), allocatable :: cos_ar(:, :), sin_ar(:, :)
-   real(kind=rprec), allocatable :: cos_toF(:, :), sin_toF(:, :)
-   real(kind=rprec) twopi, arg
+   real(r8), allocatable :: thtgrd(:), ztgrd(:), rn(:), rm(:)
+   real(r8), allocatable :: fnm(:), f(:), anm(:)
+   real(r8), allocatable :: cos_ar(:, :), sin_ar(:, :)
+   real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
+   real(r8) twopi, arg
    logical, parameter :: ipos_def_sym = .false.
 !    The subset_eq flag allows one to just request a bracketed subset of
 !     eigenvalues, rather than all eigenvalues. This option has not been
@@ -23,14 +28,16 @@ module fourier_lib
    logical, parameter :: subset_eq = .false.
 !   Eigenfunction arrays,variables
    integer :: count, mn_col, ith_col, izt_col
-   real(kind=rprec), allocatable :: rn_col(:), rm_col(:)
-   real(kind=rprec), allocatable :: rn2_col(:), rm2_col(:), rnm_col(:)
+   real(r8), allocatable :: rn_col(:), rm_col(:)
+   real(r8), allocatable :: rn2_col(:), rm2_col(:), rnm_col(:)
    integer, allocatable :: in_col(:), im_col(:)
    integer, allocatable :: in_col_aug(:), im_col_aug(:)
-   integer, allocatable :: nw(:), mwl(:), mwu(:)
+   ! integer, allocatable :: nw(:), mwl(:), mwu(:)
+
 contains
 !
    subroutine readin
+      integer :: i, istat
       open (unit=20, file="fourier.dat", status="old")
       read (20, *) nfp, ith, izt, mode_family
       mpol = ith*2/5; ntor = izt*2/5 ! Done to avoid aliasing issues
@@ -47,9 +54,8 @@ contains
 !
 !
    subroutine trig_array
-      use kind_spec
-      implicit none
-      real(kind=rprec) :: dum, dnorm
+      integer :: istat
+      real(r8) :: dum, dnorm
       allocate (thtgrd(nznt), stat=istat)
       allocate (ztgrd(nznt), stat=istat)
       allocate (rm(mnmx), stat=istat)
@@ -83,8 +89,8 @@ contains
             rn(mn) = real(n*nfp)
          end do
       end do
-      do i = 1, nznt
-         do mn = 1, mnmx
+      do i = 1, nznt ! =ith*izt
+         do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn)*ztgrd(i) + rm(mn)*thtgrd(i)
             cos_ar(i, mn) = cos(arg)
             sin_ar(i, mn) = sin(arg)
@@ -98,8 +104,7 @@ contains
    end subroutine trig_array
 
    subroutine convolution_array
-      use kind_spec
-      implicit none
+      integer :: istat
 !     First, count the number of modes to be used
       count = 0
       do i = 1, ntors
@@ -134,9 +139,8 @@ contains
 !
 !
    subroutine scs_convolve(ans, m1, n1, m2, n2, meq, neq)
-      use kind_spec
-      implicit none
-      real(kind=rprec) :: tht_int1, tht_int2, tht_int3, tht_int4,&
+      integer :: istat
+      real(r8) :: tht_int1, tht_int2, tht_int3, tht_int4,&
       &zeta_int1, zeta_int2, zeta_int3, zeta_int4, ans
       integer :: m1, m2, n1, n2, meq, neq
       integer :: sm1, sm2, sn1, sn2, smeq, sneq
@@ -176,9 +180,8 @@ contains
 !
 !
    subroutine ccc_convolve(ans, m1, n1, m2, n2, meq, neq)
-      use kind_spec
-      implicit none
-      real(kind=rprec) :: tht_int1, tht_int2, tht_int3, tht_int4,&
+      integer :: istat
+      real(r8) :: tht_int1, tht_int2, tht_int3, tht_int4,&
       &zeta_int1, zeta_int2, zeta_int3, zeta_int4, ans
       integer :: m1, m2, n1, n2, meq, neq
       integer :: sm1, sm2, sn1, sn2, smeq, sneq
@@ -218,10 +221,10 @@ contains
 !
 !
    subroutine ccc(result, i, j, k)
-      use kind_spec
-      real(kind=rprec), parameter :: zero = 0, one = 1,&
+      integer :: istat
+      real(r8), parameter :: zero = 0, one = 1,&
       &two = 2, four = 4
-      real(kind=rprec) :: result
+      real(r8) :: result
       integer :: i, j, k, izeros
 !
 !     This subroutine calculates the 1D integral of
@@ -273,11 +276,11 @@ contains
 !
 !
    subroutine css(result, k, i, j)
-      use kind_spec
-      real(kind=rprec), parameter :: one = 1, neg_one = -1, zero = 0,&
+      integer :: istat
+      real(r8), parameter :: one = 1, neg_one = -1, zero = 0,&
       &two = 2, neg_two = -2
       integer :: i, j, k
-      real(kind=rprec) :: result
+      real(r8) :: result
 !
 !     This subroutine calculates the 1D integral of
 !     cos(k*x)*sin(i*x)*sin(j*x)

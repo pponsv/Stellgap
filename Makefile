@@ -9,7 +9,7 @@ METRIC   = metric_element_create_ver8.46
 NOSOUND  = stellgap_ver5
 SOUND    = stellgap_soundwave_lagrng_ver7
 SERIAL   = SERIAL # PARALLEL or SERIAL
-OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o post_process.o
+OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o post_process.o read_input.o output.o
 OFILES   = $(patsubst %, $(BLD)/%, $(OFILES_i))
 
 #	Flags
@@ -23,7 +23,7 @@ GFLAGS      = -O2 -ffree-form -J$(BLD)
 
 all: build link
 
-build : $(BIN) $(BLD) $(BIN)/xmetric $(BIN)/xstgap $(BIN)/xstgap_snd
+build : $(BIN) $(BLD) $(BIN)/xmetric $(BIN)/xstgap $(BIN)/xstgap_snd $(BIN)/xstgap_new
 
 debug: clean all
 
@@ -49,11 +49,17 @@ $(BIN)/xstgap_snd: $(SRC)/$(SOUND).f90 $(OFILES)
 $(BIN)/xstgap: $(SRC)/$(NOSOUND).f90 $(OFILES)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(LIBS) -o $@
 
+$(BIN)/xstgap_new: $(SRC)/$(NOSOUND)_new.f90 $(OFILES)
+	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(LIBS) -o $@
+
 $(BLD)/%.o : $(SRC)/%.f90
 	gfortran $(GFLAGS) -c $< -o $@
 
 #	Dependencies
-$(BLD)/fourier_lib.o: $(BLD)/kind_spec.o
+
+$(BLD)/output.o : $(BLD)/kind_spec.o
+
+$(BLD)/fourier_lib.o: $(BLD)/kind_spec.o $(BLD)/read_input.o
 
 $(BLD)/fitpack.o: $(BLD)/kind_spec.o
 
