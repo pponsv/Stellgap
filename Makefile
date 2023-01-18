@@ -46,11 +46,7 @@ $(BIN)/xmetric: $(SRC)/$(METRIC).f90
 $(BIN)/xstgap_snd: $(SRC)/$(SOUND).f90 $(OFILES)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 		
-<<<<<<< HEAD
-$(BIN)/xstgap: $(SRC)/$(NOSOUND).f $(OFILES)
-=======
 $(BIN)/xstgap: $(SRC)/$(NOSOUND).f90 $(OFILES)
->>>>>>> 0a98fc9 (Reformatted fixed form to free form)
 	gfortran $(PREPFLAGS) $(GFLAGS) $^ $(MKLFLAGS) -o $@
 
 $(BLD)/%.o : $(SRC)/%.f90
