@@ -40,7 +40,7 @@ rmlink:
 	rm -f ~/.local/bin/xmetric
 
 #	Compilation
-$(BIN)/xmetric: $(SRC)/$(METRIC).f90
+$(BIN)/xmetric: $(SRC)/$(METRIC).f90 $(BLD)/kind_spec.o
 	gfortran $(GFLAGS) -I $(LIBSTELL) $^ $(METRICFLAGS) -o $@
 
 $(BIN)/xstgap_snd: $(SRC)/$(SOUND).f90 $(OFILES)

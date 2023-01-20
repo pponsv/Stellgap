@@ -5,9 +5,8 @@
 module fourier_lib
 
    use kind_spec
-   use input, only: &
-      ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family, &
-      nw, mwl, mwu
+   use input, only: ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, &
+      mode_family, nw, mwl, mwu
 
    implicit none
 

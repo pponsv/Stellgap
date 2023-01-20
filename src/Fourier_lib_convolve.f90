@@ -1,6 +1,7 @@
 module Fourier_lib_convolve
    use fourier_lib
    use fitpack
+   use kind_spec
    implicit none
 
 contains
@@ -34,7 +35,7 @@ contains
    end subroutine toFourier
 !
    subroutine old_toFourier
-      real(kind=rprec) dum, dnorm
+      real(r8) dum, dnorm
 !
 !   Do Fourier transform integrations needed to convert data on a
 !   theta, zeta grid [stored in array f(i=1,nznt)] to a set

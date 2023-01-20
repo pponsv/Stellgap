@@ -20,7 +20,7 @@ use read_boozer_mod, iota_bw => iota_b, bmnc_bw => bmnc_b,&
 &pmns_bw => pmns_b, pres_bw => pres_b, phip_bw => phip_b,&
 &bvco_bw => bvco_b, buco_bw => buco_b, ixm_bw => ixm_b,&
 &ixn_bw => ixn_b
-use stel_kinds
+use kind_spec
 !
 !
 implicit none
@@ -28,40 +28,40 @@ implicit none
 !-----------------------------------------------
 !   L o c a l   P a r a m e t e r s
 !-----------------------------------------------
-real(kind=rprec), parameter :: p5 = 0.5_dp, one = 1.0_dp
-REAL(kind=rprec), PARAMETER :: twopi = 6.28318530717958623_dp
-REAL(kind=rprec), PARAMETER :: mu_0 = 2.0e-7_dp*twopi
-real(kind=rprec), parameter :: zero = 0.0_dp, two = 2.0_dp
+real(r8), parameter :: p5 = 0.5_dp, one = 1.0_dp
+REAL(r8), PARAMETER :: twopi = 6.28318530717958623_dp
+REAL(r8), PARAMETER :: mu_0 = 2.0e-7_dp*twopi
+real(r8), parameter :: zero = 0.0_dp, two = 2.0_dp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: hiota, hpres,&
+REAL(r8), DIMENSION(:), ALLOCATABLE :: hiota, hpres,&
 &hphip, hjtor, hjpol
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: iotaf, jpolf,&
+REAL(r8), DIMENSION(:), ALLOCATABLE :: iotaf, jpolf,&
 &jtorf, phipf, presf
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: iotapf, jpolpf,&
+REAL(r8), DIMENSION(:), ALLOCATABLE :: iotapf, jpolpf,&
 &jtorpf, phippf, prespf
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: xmb, xnb, xm, xn
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: radii, radii_flux
-REAL(kind=rprec), DIMENSION(:, :), ALLOCATABLE :: rmncbf, zmnsbf,&
+REAL(r8), DIMENSION(:), ALLOCATABLE :: xmb, xnb, xm, xn
+REAL(r8), DIMENSION(:), ALLOCATABLE :: radii, radii_flux
+REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncbf, zmnsbf,&
 &pmnsbf, bmncbf
-REAL(kind=rprec), DIMENSION(:, :), ALLOCATABLE :: rmncpbf, zmnspbf,&
+REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncpbf, zmnspbf,&
 &pmnspbf, bmncpbf
-REAL(kind=rprec), DIMENSION(:, :), ALLOCATABLE :: rmncbh, zmnsbh,&
+REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncbh, zmnsbh,&
 &pmnsbh, bmncbh
-REAL(kind=rprec), DIMENSION(:, :), ALLOCATABLE :: bfield,&
+REAL(r8), DIMENSION(:, :), ALLOCATABLE :: bfield,&
 &bfields, bfieldze, bfieldth, rjacob, rjacobze, rjacobth,&
 &rjacobs, gsssup, gttsup, gzzsup, gstsup,&
 &gszsup, gtzsup, brho
-REAL(kind=rprec), DIMENSION(:), ALLOCATABLE :: jprl_coef0,&
+REAL(r8), DIMENSION(:), ALLOCATABLE :: jprl_coef0,&
 &jprl_coef1, jprl_coef2
-REAL(kind=rprec), DIMENSION(3, 3) :: mat_lowr
-REAL(kind=rprec), DIMENSION(3, 3) :: mat_upr
-REAL(kind=rprec), DIMENSION(3, 3) :: mat_diag
+REAL(r8), DIMENSION(3, 3) :: mat_lowr
+REAL(r8), DIMENSION(3, 3) :: mat_upr
+REAL(r8), DIMENSION(3, 3) :: mat_diag
 integer :: nsurf
-real(kind=rprec):: phipc, iotac, jtorc, jpolc,&
+real(r8):: phipc, iotac, jtorc, jpolc,&
 &presc, prespc, jtorpc, jpolpc, phippc, iotapc
-real(kind=rprec) :: phis, phize, phith, rboo, rs,&
+real(r8) :: phis, phize, phith, rboo, rs,&
 &rze, rth, zs, zze, zth, arg, ccosi, ssine, num1,&
 &num2, ibf2, ibf3, rboo2, rjac2, rjac2i, gtssub, gstsub,&
 &gzssub, gszsub, gtzsub, gztsub, gttsub, gsssub,&
@@ -70,7 +70,7 @@ real(kind=rprec) :: phis, phize, phith, rboo, rs,&
 &thetang, zetang, det, error, rjac2_avg, det_avg,&
 &zboo, phiboo, xr, yr, zr
 INTEGER :: nfp, nsd, mnboz, i, j, k, mn, kz, kt, ks
-REAL(kind=rprec) :: r0, b0, amin, beta0, r0max, r0min,&
+REAL(r8) :: r0, b0, amin, beta0, r0max, r0min,&
 &aspect, betaxis, ohs2, mat_test_diag, mat_test_offdiag
 character arg1*40, warg1*45, bozout*45
 character*1 tb
@@ -180,8 +180,8 @@ end do
 call read_boozer_deallocate
 allocate (radii(nsd), radii_flux(nsd), stat=istat)
 do i = 1, nsd
-   radii(i) = sqrt(real(i - 1, kind=rprec)/(nsd - 1))     !  r/a= (radii_flux)**1/2
-   radii_flux(i) = real(i - 1, kind=rprec)/(nsd - 1)    !  s = radii_flux
+   radii(i) = sqrt(real(i - 1, r8)/(nsd - 1))     !  r/a= (radii_flux)**1/2
+   radii_flux(i) = real(i - 1, r8)/(nsd - 1)    !  s = radii_flux
 end do
 
 if (rmncbh(1, nsd) .eq. 0.) then
