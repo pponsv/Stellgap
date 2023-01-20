@@ -1,6 +1,7 @@
 #	Paths
 BIN      = ./bin
 SRC      = ./src
+SRC_NEW  = ./src
 BLD      = ./bld
 LIBSTELL = ${HOME}/bin/libstell_dir/
 
@@ -10,7 +11,8 @@ NOSOUND  = stellgap_ver5
 SOUND    = stellgap_soundwave_lagrng_ver7
 SERIAL   = SERIAL # PARALLEL or SERIAL
 OFILES_i = fitpack.o Fourier_lib_convolve.o fourier_lib.o post_process.o read_input.o output.o
-OFILES   = $(patsubst %, $(BLD)/%, $(OFILES_i))
+OFILES   = $(patsubst %.o, $(BLD)/%.o, $(OFILES_i))
+#OFILES_NEW = $(patsubst %.o, $(BLD)/%_new.o, $(OFILES_i))
 
 #	Flags
 # LIBS    = -lmkl_gf_lp64 -lmkl_core -lmkl_sequential -lpthread -lm
@@ -55,7 +57,9 @@ $(BIN)/xstgap_new: $(SRC)/$(NOSOUND)_new.f90 $(OFILES)
 $(BLD)/%.o : $(SRC)/%.f90
 	gfortran $(GFLAGS) -c $< -o $@
 
-#	Dependencies
+#$(BLD)/%_new.o : $(SRC)/%.f90
+#	gfortran $(GFLAGS) -c $< -o $@
+##	Dependencies
 
 $(BLD)/output.o : $(BLD)/kind_spec.o
 

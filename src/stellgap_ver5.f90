@@ -139,51 +139,51 @@ program tae_continua
    external dggev, dsygv, dsygvx
    integer :: ir_fine_scl, irads, irad3
    integer, parameter :: iopt = 1
-   real(kind=rprec), parameter :: R0 = 1.0
-   real(kind=rprec), parameter :: mass_proton = 1.67d-27
-   real(kind=rprec) :: ion_density_0, mass_ion, ion_to_proton_mass,&
+   real(r8), parameter :: R0 = 1.0
+   ! real(r8), parameter :: mass_proton = 1.67d-27
+   real(r8) :: ion_density_0, mass_ion, ion_to_proton_mass,&
    &aion, bion, cion
 !     Telec does nothing, added for compat. with sound version
-   real(kind=rprec) :: nion(10), telec(10)
+   real(r8) :: nion(10), telec(10)
    integer :: ir, irr, il, iu, ion_profile
    character*4 :: egnout_form
    logical :: jdqz_data
-   real(kind=rprec), dimension(:, :, :), allocatable :: bfield,&
+   real(r8), dimension(:, :, :), allocatable :: bfield,&
    &gsssup, rjacob, bsupth, bsupzt, bfield_lrg,&
    &gsssup_lrg, bsupth_lrg, bsupzt_lrg, rjacob_lrg
-   real(kind=rprec), dimension(:), allocatable :: theta_tae,&
+   real(r8), dimension(:), allocatable :: theta_tae,&
    &zeta_tae, f1_nm, f3a_nm, f3b_nm, f3c_nm, bsupth_tmp, bsupzt_tmp
-   real(kind=rprec), dimension(:, :), allocatable :: f1, f3a,&
+   real(r8), dimension(:, :), allocatable :: f1, f3a,&
    &f3b, f3c
 
-   real(kind=rprec), dimension(:), allocatable :: bavg, mu0_rho_ion,&
+   real(r8), dimension(:), allocatable :: bavg, mu0_rho_ion,&
    &ion_density, iota_r, iota_r_inv
 
-   real(kind=rprec), allocatable :: beta(:), aux(:), eig_vect(:)
-   real(kind=rprec), allocatable :: amat(:, :),&
+   real(r8), allocatable :: beta(:), aux(:), eig_vect(:)
+   real(r8), allocatable :: amat(:, :),&
    &bmat(:, :), z_r(:, :), vr(:, :), vl(:, :)
-   real(kind=rprec), allocatable :: bgrad2(:, :, :)
-   real(kind=rprec), allocatable :: omega(:), work(:), alfr(:),&
+   real(r8), allocatable :: bgrad2(:, :, :)
+   real(r8), allocatable :: omega(:), work(:), alfr(:),&
    &alfi(:)
    complex*16, allocatable :: alpha(:)
 
-   real(kind=rprec), dimension(:), allocatable :: nsurf, iotac,&
+   real(r8), dimension(:), allocatable :: nsurf, iotac,&
    &phipc, rho, sp_fit, b2, iotac_inv
 
-   real(kind=rprec) :: sp1, sp2, sigma_spl, r_pt,&
+   real(r8) :: sp1, sp2, sigma_spl, r_pt,&
    &iotac_r, dum1, dum2, dum3, dum4
 
-   real(kind=rprec), dimension(:), allocatable :: yp, temp,&
+   real(r8), dimension(:), allocatable :: yp, temp,&
    &ypi, tempi
 
-   real(kind=rprec) :: amat1, amat2, amat3, amat4, amat5
-   real(kind=rprec) :: f1_coef, f2a_coef, f3a_coef,&
+   real(r8) :: amat1, amat2, amat3, amat4, amat5
+   real(r8) :: f1_coef, f2a_coef, f3a_coef,&
    &f3b_coef, f3c_coef
-   real(kind=rprec) :: dm1, dm2, dm3, dm4, dm5, bfavg, va
-   real(kind=rprec) :: f1max, eig_max, mu0, scale_khz,&
+   real(r8) :: dm1, dm2, dm3, dm4, dm5, bfavg, va
+   real(r8) :: f1max, eig_max, mu0, scale_khz,&
    &f3amax, f3bmax, f3cmax, ccci, scsi, test,&
    &egl, egu, abstol, f1_avg, f3_avg
-   real(kind=rprec) :: ra, ra2, ra3, ra4, ra5, ra6
+   real(r8) :: ra, ra2, ra3, ra4, ra5, ra6
    integer :: ispl_opt, ierr_spl, num_eq, naux
    integer :: ier, npes, mype, numrads
    integer :: ni, nj, mi, mj, ieq, meq, neq, ii, jj

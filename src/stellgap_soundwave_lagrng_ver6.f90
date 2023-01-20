@@ -138,7 +138,7 @@ program tae_continua
 !      integer, parameter :: irads = 89, irad3 = 3*irads
    integer, parameter :: iopt = 1, iradt = 300
    real(kind=rprec), parameter :: R0 = 1.0
-   real(kind=rprec), parameter :: mass_proton = 1.67d-27
+   ! real(kind=rprec), parameter :: mass_proton = 1.67d-27
    real(kind=rprec) :: ion_density_0, mass_ion, ion_to_proton_mass,&
    &aion, bion, cion
    real(kind=rprec) :: nion(10), telec(9)

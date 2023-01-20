@@ -4,7 +4,9 @@ module input
 
    implicit none
 
-   !  read_args
+   public
+   
+   !  read_args (command line)
    character*10 :: arg1, arg2
    integer :: irads, ir_fine_scl, irad3
 
@@ -18,7 +20,7 @@ module input
    integer, allocatable :: nw(:), mwl(:), mwu(:)
 
    !  read_tae_data_boozer
-   logical :: lrfp
+   logical :: lrfp ! If true: use reversed field pinch settings
    integer :: nn
    real(r8) :: bfavg
    real(r8), allocatable, dimension(:) :: iotac, phipc, iotac_inv, nsurf, b2, &
@@ -97,7 +99,6 @@ contains
 
 
    subroutine read_fourier_dat
-      !  Dummy
       integer :: i, istat
 
       open (unit=20, file="fourier.dat", status="old")
