@@ -11,6 +11,7 @@ contains
    subroutine read_tae_data_boozer
       use globals, only: irads, lrfp, rho, iotac, izt, ith, theta_tae, zeta_tae,&
          rjacob, phipc, bfield, gsssup, bfavg
+
       integer :: ir, i, j, nn(irads)
       real(r8) :: dum1, dum2,  dm1, dm2, dm3, dm4, dm5
 
@@ -49,7 +50,7 @@ contains
 
 
    subroutine read_args
-      use globals, only : irads, irad3, ir_fine_scl
+      use globals, only : irads, ir_fine_scl
 
       character*10 :: arg1, arg2
 
@@ -61,9 +62,8 @@ contains
 
       read (arg1, '(i3)') irads
       read (arg2, '(i4)') ir_fine_scl
-      irad3 = 3*irads
 
-      write (*, '("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)') irads, irad3, ir_fine_scl
+      write (*, '("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)') irads, 3*irads, ir_fine_scl
 
    end subroutine read_args
 

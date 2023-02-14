@@ -5,7 +5,7 @@ module globals
 
    implicit none
 
-   integer :: irads, ir_fine_scl, irad3
+   integer :: irads, ir_fine_scl
 
    logical :: lrfp ! If true: use reversed field pinch settings
 

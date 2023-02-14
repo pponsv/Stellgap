@@ -20,7 +20,6 @@ program tae_continua
 
    external dggev, dsygv, dsygvx ! LAPACK subroutines
 
-   ! integer :: ir_fine_scl, irads, irad3
    integer, parameter :: iopt = 1
    real(r8), parameter :: R0 = 1.0 ! Useless?
 
@@ -79,8 +78,8 @@ program tae_continua
       ion_density(ir_fine_scl), iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
    allocate (iotac(irads), phipc(irads), sp_fit(irads), stat = istat)
-   allocate (yp(irad3), temp(irad3), ypi(irad3), &
-      tempi(irad3), stat = istat)
+   allocate (yp(3*irads), temp(3*irads), ypi(3*irads), &
+      tempi(3*irads), stat = istat)
 
    mype = 0
    npes = 1
