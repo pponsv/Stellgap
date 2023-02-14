@@ -31,4 +31,5 @@ x*
 # Folders
 bld/
 bin/
+build/
 .*/

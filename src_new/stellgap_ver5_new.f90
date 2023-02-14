@@ -136,7 +136,7 @@ program tae_continua
 	!      The Fourier xform is done by subroutine toFourier using
 	!      cos/sin expansions. (use with Fourier_lib.f)
 	!
-	!
+	
 	external dggev, dsygv, dsygvx ! LAPACK subroutines
 	
 	! integer :: ir_fine_scl, irads, irad3
