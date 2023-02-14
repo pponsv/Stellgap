@@ -6,26 +6,11 @@ module input
 
    public
 
-   !  read_plasma_dat
-   real(r8) :: ion_to_proton_mass, ion_density_0, aion, bion, cion, &
-      nion(10), telec(10)
-   integer :: ion_profile
-
-   !  read_fourier_dat
-   integer :: ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family
-   integer, allocatable :: nw(:), mwl(:), mwu(:)
-
-   !  read_tae_data_boozer
-
-   real(r8) :: bfavg
-   real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
-   real(r8), allocatable, dimension(:,:,:) :: bfield, rjacob, gsssup
-
-
 contains
 
    subroutine read_tae_data_boozer
-      use globals, only: irads, lrfp, rho
+      use globals, only: irads, lrfp, rho, iotac, izt, ith, theta_tae, zeta_tae,&
+         rjacob, phipc, bfield, gsssup, bfavg
       integer :: ir, i, j, nn(irads)
       real(r8) :: dum1, dum2,  dm1, dm2, dm3, dm4, dm5
 
@@ -84,6 +69,9 @@ contains
 
 
    subroutine read_plasma_dat
+      use globals, only: mass_ion, ion_density_0, ion_profile, nion, telec, aion, bion, cion
+
+      real(r8) :: ion_to_proton_mass
       logical :: jdqz_data       ! Useless, for compatibility with AE3D
       character*4 :: egnout_form ! Useless, for compatibility with AE3D
 
@@ -98,10 +86,14 @@ contains
       read (4, plasma_input)
       close(4)
 
+      mass_ion = mass_proton * ion_to_proton_mass
+
    end subroutine read_plasma_dat
 
 
    subroutine read_fourier_dat
+      use globals, only: nfp, ith, izt, mode_family, ntors, nw, mwl, mwu, mpol, ntor,&
+         nznt, mnmx
       integer :: i, istat
 
       open (unit=20, file="fourier.dat", status="old")

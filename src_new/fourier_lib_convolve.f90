@@ -1,4 +1,4 @@
-module Fourier_lib_convolve
+module fourier_lib_convolve
    use fourier_lib
    use fitpack
    use kind_spec
@@ -127,4 +127,4 @@ contains
       end if
    end subroutine dbydzt
 
-end module Fourier_lib_convolve
+end module fourier_lib_convolve

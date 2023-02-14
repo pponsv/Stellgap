@@ -2,7 +2,7 @@
 program tae_continua
 
    use fourier_lib
-   use Fourier_lib_convolve
+   use fourier_lib_convolve
    use kind_spec
    use postprocess
    use fitpack
@@ -24,7 +24,7 @@ program tae_continua
    integer, parameter :: iopt = 1
    real(r8), parameter :: R0 = 1.0 ! Useless?
 
-   real(r8) :: mass_ion
+
    integer :: ir, irr, il, iu
    real(r8), dimension(:, :, :), allocatable :: bsupth, bsupzt, bfield_lrg, &
    &gsssup_lrg, bsupth_lrg, bsupzt_lrg, rjacob_lrg
@@ -52,7 +52,6 @@ program tae_continua
 
    real(r8) :: va, eig_max, scale_khz, ccci, scsi, &
       egl, egu, abstol, f1_avg, f3_avg
-   real(r8) :: ra, ra2, ra3, ra4, ra5, ra6
    integer :: ispl_opt, ierr_spl, num_eq, naux
    integer :: npes, mype, numrads
    integer :: ni, nj, mi, mj, ieq, meq, neq
@@ -73,8 +72,6 @@ program tae_continua
    call read_args
 
    call read_plasma_dat
-
-   mass_ion = mass_proton * ion_to_proton_mass
 
    call read_fourier_dat
 
@@ -185,10 +182,8 @@ program tae_continua
    call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, &
    &tempi, sigma_spl, ierr_spl)
    do irr = 1, ir_fine_scl
-      r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-      & / real(ir_fine_scl - 1)
-      ra = sqrt(r_pt); ra2 = ra**2; ra3 = ra**3; ra4 = ra**4
-      ra5 = ra**5; ra6 = ra**6
+      r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1)) / real(ir_fine_scl - 1) ! Interpola rho a ir_fine_scl
+      ! ra = sqrt(r_pt); ra2 = ra**2; ra3 = ra**3; ra4 = ra**4; ra5 = ra**5; ra6 = ra**6
       iota_r(irr) = curv2(r_pt, irads, rho, iotac, ypi, sigma_spl)
 
       if (ion_profile .eq. 0) then

@@ -5,8 +5,7 @@
 module fourier_lib
 
    use kind_spec
-   use input, only : ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, &
-      mode_family, nw, mwl, mwu
+   use globals
 
    implicit none
 
@@ -34,21 +33,21 @@ module fourier_lib
 
 contains
    !
-   subroutine readin
-      integer :: i, istat
-      open (unit = 20, file = "fourier.dat", status = "old")
-      read (20, *) nfp, ith, izt, mode_family
-      mpol = ith * 2 / 5; ntor = izt * 2 / 5 ! Done to avoid aliasing issues
-      nznt = ith * izt; mnmx = (2 * ntor + 1) * mpol - ntor
-      read (20, *) ntors
-      allocate (nw(ntors), stat = istat)
-      allocate (mwl(ntors), stat = istat)
-      allocate (mwu(ntors), stat = istat)
-      do i = 1, ntors
-         read (20, *) nw(i), mwl(i), mwu(i)
-      end do
-      close (unit = 20)
-   end subroutine readin
+   ! subroutine readin
+   !    integer :: i, istat
+   !    open (unit = 20, file = "fourier.dat", status = "old")
+   !    read (20, *) nfp, ith, izt, mode_family
+   !    mpol = ith * 2 / 5; ntor = izt * 2 / 5 ! Done to avoid aliasing issues
+   !    nznt = ith * izt; mnmx = (2 * ntor + 1) * mpol - ntor
+   !    read (20, *) ntors
+   !    allocate (nw(ntors), stat = istat)
+   !    allocate (mwl(ntors), stat = istat)
+   !    allocate (mwu(ntors), stat = istat)
+   !    do i = 1, ntors
+   !       read (20, *) nw(i), mwl(i), mwu(i)
+   !    end do
+   !    close (unit = 20)
+   ! end subroutine readin
    !
    !
    subroutine trig_array
