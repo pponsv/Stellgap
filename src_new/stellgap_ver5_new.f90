@@ -55,11 +55,9 @@ program tae_continua
    integer :: ldvl, ldvr, lwork, info, m_red
    integer, allocatable :: ifail(:), iwork(:)
    logical :: cyl
-   character*20 outfile
-   character*3 procnum
    character*1 jobz
-   character*10 date, time, zone
-   integer values(8)
+
+   !  START PROGRAM
 
    cyl = .false.
    lrfp = .false.
@@ -70,7 +68,7 @@ program tae_continua
 
    call read_fourier_dat
 
-   allocate (bavg(ir_fine_scl), mu0_rho_ion(ir_fine_scl), &
+   allocate (mu0_rho_ion(ir_fine_scl), &
       ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
    allocate (iotac(irads), phipc(irads), sp_fit(irads), stat = istat)
@@ -78,18 +76,12 @@ program tae_continua
       tempi(3*irads), stat = istat)
 
    jobz = 'V'
-   outfile = "alfven_spec"
 
    if (ipos_def_sym) isym_opt = 1
    if (.NOT. ipos_def_sym) isym_opt = 0
 
-   !
    !    Generate Fourier arrays
-   !
-   ! call readin
-
    call trig_array
-
    call convolution_array
 
    naux = 10 * mn_col
@@ -141,7 +133,7 @@ program tae_continua
 
    write (*, *) izt, ith, irads, mnmx, nznt, mn_col
 
-   open (unit = 21, file = trim(adjustl(outfile)), status = "unknown")
+   open (unit = 21, file = "alfven_spec", status = "unknown")
    open (unit = 8, file = "coef_arrays", status = "unknown")
 
    !    Boozer coordinates input - new ae-mode-structure input
@@ -188,16 +180,13 @@ program tae_continua
    rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
-   !     Fine_scale arrays and spline fits finished
-   !
-   ! numrads = ir_fine_scl / npes
-   !       write(*,*) numrads
+   !  Main loop   
    do ir = (1), (ir_fine_scl)
       !       write(*,*) ir
       !      do ir=1,ir_fine_scl
-      r_pt = rho(1) + real(ir - 1) * (rho(irads) - rho(1))&
-      & / real(ir_fine_scl - 1)
-      print *, ir, r_pt
+      ! r_pt = rho(1) + real(ir - 1) * (rho(irads) - rho(1))&
+      ! & / real(ir_fine_scl - 1)
+      print *, ir, rho_fine(ir)
       f1_avg = 0.; f3_avg = 0.
       do i = 1, izt
          do j = 1, ith
@@ -220,25 +209,12 @@ program tae_continua
          end do
       end do
 
+      !  Inútil?
       if (cyl) then
          if (.not. lrfp) then
-            do i = 1, izt
-               do j = 1, ith
-                  f1(i, j) = f1_avg
-                  !         f3a(i,j) = f3_avg*iota_r(ir)*iota_r(ir)
-                  !         f3b(i,j) = f3_avg*iota_r(ir)
-                  !         f3c(i,j) = f3_avg
-               end do
-            end do
+            f1 = f1_avg
          else if (lrfp) then
-            do i = 1, izt
-               do j = 1, ith
-                  f1(i, j) = f1_avg
-                  !         f3a(i,j) = f3_avg
-                  !         f3b(i,j) = f3_avg*iota_r_inv(ir)
-                  !         f3c(i,j) = f3_avg*iota_r_inv(ir)**iota_r_inv(ir)
-               end do
-            end do
+            f1 = f1_avg
          end if
       end if
       !
@@ -332,7 +308,7 @@ program tae_continua
       egl = 1.d-2; egu = 0.6d0; abstol = 1.d-8
       il = 0; iu = 0
 
-      if (.NOT. ipos_def_sym) then
+      if (.not. ipos_def_sym) then
          call dggev('N', 'V', mn_col, amat, mn_col, bmat, mn_col, alfr, alfi, &
          &beta, vl, ldvl, vr, ldvr, work, lwork, info)
       else if (ipos_def_sym .and. .not. subset_eq) then
@@ -353,7 +329,7 @@ program tae_continua
             do j = 1, mn_col
                if (ipos_def_sym .and. jobz .eq. 'V' .and. .not. subset_eq)&
                &eig_vect(j) = abs(amat(j, i))
-               if (.NOT. ipos_def_sym) eig_vect(j) = abs(vr(j, i))
+               if (.not. ipos_def_sym) eig_vect(j) = abs(vr(j, i))
                !        if(ir .eq. 5 .and. i .eq. mn_col/2)
                !     >   write(*,'(e15.7,2x,i4,2x,i4)') eig_vect(j),
                !     >   im_col(j), in_col(j)
@@ -374,17 +350,17 @@ program tae_continua
             !     >    j_max_index
 
             if (ipos_def_sym) then
-               write (21, '(2(e15.7,2x),i4,2x,i4)') r_pt, sqrt(abs(omega(i))), &
+               write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), &
                &m_emax, n_emax
             else if (.NOT. ipos_def_sym) then
-               write (21, '(4(e15.7,2x),i4,2x,i4)') r_pt, alfr(i), &
+               write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), &
                &alfi(i), beta(i), m_emax, n_emax
             end if
          else if (iopt .eq. 0) then
             if (ipos_def_sym) then
-               write (21, '(e15.7,2x,e15.7)') r_pt, sqrt(abs(omega(i)))
+               write (21, '(e15.7,2x,e15.7)') rho_fine(ir), sqrt(abs(omega(i)))
             else if (.NOT. ipos_def_sym) then
-               write (21, '(e15.7,3(2x,e15.7))') r_pt, alfr(i), &
+               write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), &
                &alfi(i), beta(i)
             end if
          end if
@@ -395,14 +371,13 @@ program tae_continua
    !
    close (unit = 21)
    close (unit = 8)
+
+   !  Write and deallocate
    write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') &
       mn_col, ir_fine_scl
-   ! write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt
-   ! close (unit = 7)
+
    call trg_deallocate
    deallocate (alpha, beta, aux)
-   call date_and_time(date, time, zone, values)
-   write (*, *) time
 
    call write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
 

@@ -29,7 +29,7 @@ module globals
    real(r8), allocatable :: rho(:), rho_fine(:)
 
    real(r8) :: scale_khz
-   real(r8), dimension(:), allocatable :: bavg, mu0_rho_ion, ion_density, iota_r, iota_r_inv
+   real(r8), dimension(:), allocatable :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
 
    real(r8), dimension(:, :, :), allocatable :: bfield_lrg, gsssup_lrg, rjacob_lrg
 
