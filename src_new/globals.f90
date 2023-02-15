@@ -30,8 +30,8 @@ module globals
 
    real(r8) :: scale_khz
    real(r8), dimension(:), allocatable :: bavg, mu0_rho_ion, ion_density, iota_r, iota_r_inv
-   integer :: mype
 
+   real(r8), dimension(:, :, :), allocatable :: bfield_lrg, gsssup_lrg, rjacob_lrg
 
 
 end module globals

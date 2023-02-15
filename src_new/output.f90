@@ -46,4 +46,14 @@ contains
 
    end subroutine write_ion_profile
 
+   subroutine write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
+      ! use globals, only: iopt, mn_col, ir_fine_scl, isym_opt
+      integer, intent(in) :: iopt, mn_col, ir_fine_scl, isym_opt
+
+      open (unit = 7, file = "data_post", status = "unknown")
+      write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt
+      close (unit = 7)
+
+   end subroutine write_data_post
+
 end module output

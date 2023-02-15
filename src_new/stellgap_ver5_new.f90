@@ -1,5 +1,6 @@
-
 program tae_continua
+
+   !  Serial version
 
    use fourier_lib
    use fourier_lib_convolve
@@ -12,26 +13,22 @@ program tae_continua
    use helper
 
    implicit none
-   !
-   !      This code is a test of a Fourier xform of a 2D function
-   !      (f) vs. theta, zeta.  f has cos/sin stellarator-like symmetry.
-   !      The Fourier xform is done by subroutine toFourier using
-   !      cos/sin expansions. (use with Fourier_lib.f)
-   !
+
 
    external dggev, dsygv, dsygvx ! LAPACK subroutines
 
    integer, parameter :: iopt = 1
 
-
    integer :: ir, irr, il, iu
-   real(r8), dimension(:, :, :), allocatable :: bsupth, bsupzt, bfield_lrg, &
-   &gsssup_lrg, bsupth_lrg, bsupzt_lrg, rjacob_lrg
    real(r8), dimension(:), allocatable :: f1_nm, f3a_nm, f3b_nm, f3c_nm, bsupth_tmp, bsupzt_tmp
    real(r8), dimension(:, :), allocatable :: f1, f3a, &
    &f3b, f3c
 
+   !!!!!!!  PRUEBAS
 
+
+
+   !!!!!!!  END PRUEBAS
 
    real(r8), allocatable :: beta(:), aux(:), eig_vect(:)
    real(r8), allocatable :: amat(:, :), &
@@ -48,10 +45,10 @@ program tae_continua
    real(r8), dimension(:), allocatable :: yp, temp, &
    &ypi, tempi
 
-   real(r8) :: va, eig_max, ccci, scsi, &
+   real(r8) :: eig_max, ccci, scsi, &
       egl, egu, abstol, f1_avg, f3_avg
    integer :: ispl_opt, ierr_spl, naux
-   integer :: npes, numrads
+   ! integer :: numrads
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
    integer :: m_emax, n_emax, isym_opt
@@ -80,18 +77,9 @@ program tae_continua
    allocate (yp(3*irads), temp(3*irads), ypi(3*irads), &
       tempi(3*irads), stat = istat)
 
-   mype = 0
-   npes = 1
    jobz = 'V'
    outfile = "alfven_spec"
 
-   if (mype .eq. 0) then
-      write (*, *) mype, npes
-      write (*, *) procnum
-      write (*, *) outfile
-      call date_and_time(date, time, zone, values)
-      write (*, *) time
-   end if
    if (ipos_def_sym) isym_opt = 1
    if (.NOT. ipos_def_sym) isym_opt = 0
 
@@ -108,6 +96,7 @@ program tae_continua
    ! mu0 = 2.d-7*TWOPI
    scale_khz = (1.d+3 * TWOPI)**2
    ldvl = mn_col; ldvr = mn_col; lwork = 20 * mn_col
+
    allocate (aux(naux), stat = istat)
    allocate (alpha(mn_col), stat = istat)
    allocate (beta(mn_col), stat = istat)
@@ -126,13 +115,13 @@ program tae_continua
    allocate (bfield(izt, ith, irads), stat = istat)
    allocate (gsssup(izt, ith, irads), stat = istat)
    allocate (rjacob(izt, ith, irads), stat = istat)
-   allocate (bsupth(izt, ith, irads), stat = istat)
-   allocate (bsupzt(izt, ith, irads), stat = istat)
-   allocate (bfield_lrg(izt, ith, ir_fine_scl), stat = istat)
-   allocate (gsssup_lrg(izt, ith, ir_fine_scl), stat = istat)
-   allocate (bsupth_lrg(izt, ith, ir_fine_scl), stat = istat)
-   allocate (bsupzt_lrg(izt, ith, ir_fine_scl), stat = istat)
-   allocate (rjacob_lrg(izt, ith, ir_fine_scl), stat = istat)
+   ! allocate (bsupth(izt, ith, irads), stat = istat)
+   ! allocate (bsupzt(izt, ith, irads), stat = istat)
+   ! allocate (bfield_lrg(izt, ith, ir_fine_scl), stat = istat)
+   ! allocate (gsssup_lrg(izt, ith, ir_fine_scl), stat = istat)
+   ! allocate (bsupth_lrg(izt, ith, ir_fine_scl), stat = istat)
+   ! allocate (bsupzt_lrg(izt, ith, ir_fine_scl), stat = istat)
+   ! allocate (rjacob_lrg(izt, ith, ir_fine_scl), stat = istat)
    allocate (theta_tae(ith), stat = istat)
    allocate (zeta_tae(izt), stat = istat)
    allocate (f1_nm(mnmx), stat = istat)
@@ -150,140 +139,65 @@ program tae_continua
    !
    !      write(*,*) trim(adjustl(outfile))
 
-   if (mype .eq. 0) then
-      write (*, *) izt, ith, irads, mnmx, nznt, mn_col
-   end if
+   write (*, *) izt, ith, irads, mnmx, nznt, mn_col
 
    open (unit = 21, file = trim(adjustl(outfile)), status = "unknown")
    open (unit = 8, file = "coef_arrays", status = "unknown")
-   if (mype .eq. 0) then
-      open (unit = 7, file = "data_post", status = "unknown")
-      ! open (unit = 9, file = "ion_profile", status = "unknown")
-   end if
-   !
+
    !    Boozer coordinates input - new ae-mode-structure input
-   !
    call read_tae_data_boozer
 
-   !
    !    Record equilibrium and eigenfunction Fourier mode list
-   !
-   if (mype .eq. 0) then
-      call write_modes(mnmx = mnmx, mn_col = mn_col, rm = rm, rn = rn, im_col = im_col, in_col = in_col)
-   end if
+   call write_modes(mnmx = mnmx, mn_col = mn_col, rm = rm, rn = rn, im_col = im_col, in_col = in_col)
+
    !
    !   Make spline fits and fill in fine_radius_scale arrays
    !
-   ! do ir = 1, irads
-   !    rho(ir) = nsurf(ir) / nsurf(irads)
-   ! end do
    ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
    call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
-
-      ! Interpola rho a ir_fine_scl
-   rho_fine = rho(1) + (rho(irads) - rho(1)) * [(irr, irr=0,ir_fine_scl-1)] / (ir_fine_scl - 1)
    do irr = 1, ir_fine_scl
       iota_r(irr) = curv2(rho_fine(irr), irads, rho, iotac, ypi, sigma_spl)
    end do
 
    select case (ion_profile)
-      case (0)
-         ion_density = (iota_r / iotac(1))**2
-      case (1)
-         ion_density = poly_eval(rho_fine, nion)
-      case (2)
-         ion_density = 1._r8
-      case (3)
-         ion_density = (1. - aion * (rho_fine**bion))**cion
+    case (0)
+      ion_density = (iota_r / iotac(1))**2
+    case (1)
+      ion_density = poly_eval(rho_fine, nion)
+    case (2)
+      ion_density = 1._r8
+    case (3)
+      ion_density = (1. - aion * (rho_fine**bion))**cion
    end select
-   
+
    mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
 
-   if (mype .eq. 0) call write_ion_profile
-
-   ! do irr=1, ir_fine_scl
-   !    va = sqrt(bfavg**2 / (mu0_rho_ion(irr) / scale_khz))
-   !    if (mype .eq. 0) then
-   !       write (9, fmt_ion_profile) rho_fine(irr), ion_density_0 * ion_density(irr), iota_r(irr), va
-   !    end if
-   ! end do
+   call write_ion_profile
 
    !   Interpolate 1/iota for lrfp = true option
    ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
    call curv1(irads, rho, 1._r8/iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
    do irr = 1, ir_fine_scl
-      ! r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-      ! & / real(ir_fine_scl - 1)
       iota_r_inv(irr) = curv2(rho_fine(irr), irads, rho, 1._r8/iotac, ypi, sigma_spl)
    end do
 
-   if (ierr_spl .ne. 0) then
-      write (*, '("spline error 1",i3)') ierr_spl
-   end if
+   if (ierr_spl .ne. 0) write (*, '("spline error 1",i3)') ierr_spl
 
-! 67 format(e12.5, 3(3x, e12.5))
-   do i = 1, izt
-      do j = 1, ith
-         !
-         !       Bfield array
-         !
-         do ir = 1, irads
-            sp_fit(ir) = bfield(i, j, ir)
-         end do      !ir=1,irads
-         ispl_opt = 3; ierr_spl = 0; sigma_spl = 0
-         call curv1(irads, rho, sp_fit, sp1, sp2, ispl_opt, yp, &
-         &temp, sigma_spl, ierr_spl)
-         if (ierr_spl .ne. 0) write (*, '("spline error 2",i3)') ierr_spl
-         do irr = 1, ir_fine_scl
-            r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-            & / real(ir_fine_scl - 1)
-            bfield_lrg(i, j, irr) = curv2(r_pt, irads, rho, sp_fit, yp, sigma_spl)
-         end do     !irr = 1,ir_fine_scl
-         !
-         !
-         !       Jacobian array
-         !
-         do ir = 1, irads
-            sp_fit(ir) = rjacob(i, j, ir)
-         end do      !ir=1,irads
-         ispl_opt = 3; ierr_spl = 0; sigma_spl = 0
-         call curv1(irads, rho, sp_fit, sp1, sp2, ispl_opt, yp, &
-         &temp, sigma_spl, ierr_spl)
-         if (ierr_spl .ne. 0) write (*, '("spline error 2",i3)') ierr_spl
-         do irr = 1, ir_fine_scl
-            r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-            & / real(ir_fine_scl - 1)
-            rjacob_lrg(i, j, irr) = curv2(r_pt, irads, rho, sp_fit, yp, sigma_spl)
-         end do     !irr = 1,ir_fine_scl
-         !
-         !       Gsssup array
-         !
-         do ir = 1, irads
-            sp_fit(ir) = gsssup(i, j, ir)
-         end do
-         ispl_opt = 3; ierr_spl = 0; sigma_spl = 0
-         call curv1(irads, rho, sp_fit, sp1, sp2, ispl_opt, yp, &
-         &temp, sigma_spl, ierr_spl)
-         if (ierr_spl .ne. 0) write (*, '("spline error 3",i3)') ierr_spl
-         do irr = 1, ir_fine_scl
-            r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-            & / real(ir_fine_scl - 1)
-            gsssup_lrg(i, j, irr) = curv2(r_pt, irads, rho, sp_fit, yp, sigma_spl)
-         end do     !irr = 1,ir_fine_scl
-      end do     !j=1,ith
-   end do     !i=1,izt
-   ! close (unit = 9)
-   !
-   !
+
+   bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
+   rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
+   gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
+
    !     Fine_scale arrays and spline fits finished
    !
-   numrads = ir_fine_scl / npes
+   ! numrads = ir_fine_scl / npes
    !       write(*,*) numrads
-   do ir = (mype * numrads + 1), (mype * numrads + numrads)
+   do ir = (1), (ir_fine_scl)
       !       write(*,*) ir
       !      do ir=1,ir_fine_scl
       r_pt = rho(1) + real(ir - 1) * (rho(irads) - rho(1))&
       & / real(ir_fine_scl - 1)
+      print *, ir, r_pt
       f1_avg = 0.; f3_avg = 0.
       do i = 1, izt
          do j = 1, ith
@@ -479,19 +393,18 @@ program tae_continua
    end do       !ir=1,ir_fine_scl
    !
    !
-   close (unit = 20)
    close (unit = 21)
    close (unit = 8)
-   if (mype .eq. 0)  then
-      write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') &
-         mn_col, ir_fine_scl
-      write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt
-      close (unit = 7)
-      call trg_deallocate
-      deallocate (alpha, beta, aux)
-      call date_and_time(date, time, zone, values)
-      write (*, *) time
-   end if
+   write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') &
+      mn_col, ir_fine_scl
+   ! write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt
+   ! close (unit = 7)
+   call trg_deallocate
+   deallocate (alpha, beta, aux)
+   call date_and_time(date, time, zone, values)
+   write (*, *) time
+
+   call write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
 
    call post_process
 

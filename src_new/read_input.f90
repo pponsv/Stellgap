@@ -9,8 +9,8 @@ module input
 contains
 
    subroutine read_tae_data_boozer
-      use globals, only: irads, lrfp, rho, iotac, izt, ith, theta_tae, zeta_tae,&
-         rjacob, phipc, bfield, gsssup, bfavg
+      use globals, only: irads, lrfp, rho, rho_fine, iotac, izt, ith, theta_tae, zeta_tae,&
+         rjacob, phipc, bfield, gsssup, bfavg, ir_fine_scl
 
       integer :: ir, i, j, nn(irads)
       real(r8) :: dum1, dum2,  dm1, dm2, dm3, dm4, dm5
@@ -44,6 +44,7 @@ contains
       end if
 
       rho = real(nn, kind=r8) / real(nn(irads), kind=r8)
+      rho_fine = rho(1) + (rho(irads) - rho(1)) * [(i, i=0,ir_fine_scl-1)] / (ir_fine_scl - 1)
       bfavg = sum(bfield) / real(irads*ith*izt, kind=r8)
 
    end subroutine read_tae_data_boozer
