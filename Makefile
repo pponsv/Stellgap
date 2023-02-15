@@ -1,6 +1,6 @@
 .PHONY : build
 
-all: build rmlink link
+all: clean build rmlink link
 
 link:
 	mkdir -p $${HOME}/.local/bin/
@@ -12,7 +12,7 @@ rmlink:
 	rm -f ~/.local/bin/xmetric
 
 build:
-	cmake --build ./build --target all
+	cmake --build ./build --target xstgap_new
 
 clean:
 	cmake --build ./build --target clean

@@ -5,6 +5,10 @@ module globals
 
    implicit none
 
+   !  Formatting
+
+
+
    integer :: irads, ir_fine_scl
 
    logical :: lrfp ! If true: use reversed field pinch settings
@@ -22,7 +26,11 @@ module globals
    real(r8) :: bfavg
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:,:,:) :: bfield, rjacob, gsssup
-   real(r8), allocatable :: rho(:)
+   real(r8), allocatable :: rho(:), rho_fine(:)
+
+   real(r8) :: scale_khz
+   real(r8), dimension(:), allocatable :: bavg, mu0_rho_ion, ion_density, iota_r, iota_r_inv
+   integer :: mype
 
 
 

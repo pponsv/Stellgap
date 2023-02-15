@@ -9,6 +9,7 @@ program tae_continua
    use input
    use output
    use globals
+   use helper
 
    implicit none
    !
@@ -21,7 +22,6 @@ program tae_continua
    external dggev, dsygv, dsygvx ! LAPACK subroutines
 
    integer, parameter :: iopt = 1
-   real(r8), parameter :: R0 = 1.0 ! Useless?
 
 
    integer :: ir, irr, il, iu
@@ -31,8 +31,7 @@ program tae_continua
    real(r8), dimension(:, :), allocatable :: f1, f3a, &
    &f3b, f3c
 
-   real(r8), dimension(:), allocatable :: bavg, mu0_rho_ion, &
-   &ion_density, iota_r, iota_r_inv
+
 
    real(r8), allocatable :: beta(:), aux(:), eig_vect(:)
    real(r8), allocatable :: amat(:, :), &
@@ -49,10 +48,10 @@ program tae_continua
    real(r8), dimension(:), allocatable :: yp, temp, &
    &ypi, tempi
 
-   real(r8) :: va, eig_max, scale_khz, ccci, scsi, &
+   real(r8) :: va, eig_max, ccci, scsi, &
       egl, egu, abstol, f1_avg, f3_avg
-   integer :: ispl_opt, ierr_spl, num_eq, naux
-   integer :: npes, mype, numrads
+   integer :: ispl_opt, ierr_spl, naux
+   integer :: npes, numrads
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
    integer :: m_emax, n_emax, isym_opt
@@ -75,7 +74,7 @@ program tae_continua
    call read_fourier_dat
 
    allocate (bavg(ir_fine_scl), mu0_rho_ion(ir_fine_scl), &
-      ion_density(ir_fine_scl), iota_r(ir_fine_scl), &
+      ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
    allocate (iotac(irads), phipc(irads), sp_fit(irads), stat = istat)
    allocate (yp(3*irads), temp(3*irads), ypi(3*irads), &
@@ -105,10 +104,10 @@ program tae_continua
 
    call convolution_array
 
-   num_eq = mnmx
    naux = 10 * mn_col
    ! mu0 = 2.d-7*TWOPI
    scale_khz = (1.d+3 * TWOPI)**2
+   ldvl = mn_col; ldvr = mn_col; lwork = 20 * mn_col
    allocate (aux(naux), stat = istat)
    allocate (alpha(mn_col), stat = istat)
    allocate (beta(mn_col), stat = istat)
@@ -118,15 +117,12 @@ program tae_continua
    allocate (amat(mn_col, mn_col), stat = istat)
    allocate (bmat(mn_col, mn_col), stat = istat)
    allocate (ifail(mn_col), stat = istat)
-   ldvl = mn_col; ldvr = mn_col; lwork = 20 * mn_col
    allocate (work(lwork), stat = istat)
    allocate (iwork(lwork), stat = istat)
    allocate (alfr(mn_col), stat = istat)
    allocate (alfi(mn_col), stat = istat)
    allocate (vl(mn_col, mn_col), stat = istat)
    allocate (vr(mn_col, mn_col), stat = istat)
-   if (mype .eq. 0)&
-   &write (*, *) izt, ith, irads, mnmx, nznt, mn_col
    allocate (bfield(izt, ith, irads), stat = istat)
    allocate (gsssup(izt, ith, irads), stat = istat)
    allocate (rjacob(izt, ith, irads), stat = istat)
@@ -154,11 +150,15 @@ program tae_continua
    !
    !      write(*,*) trim(adjustl(outfile))
 
+   if (mype .eq. 0) then
+      write (*, *) izt, ith, irads, mnmx, nznt, mn_col
+   end if
+
    open (unit = 21, file = trim(adjustl(outfile)), status = "unknown")
    open (unit = 8, file = "coef_arrays", status = "unknown")
    if (mype .eq. 0) then
       open (unit = 7, file = "data_post", status = "unknown")
-      open (unit = 9, file = "ion_profile", status = "unknown")
+      ! open (unit = 9, file = "ion_profile", status = "unknown")
    end if
    !
    !    Boozer coordinates input - new ae-mode-structure input
@@ -178,45 +178,50 @@ program tae_continua
    !    rho(ir) = nsurf(ir) / nsurf(irads)
    ! end do
    ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
-   call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, &
-   &tempi, sigma_spl, ierr_spl)
+   call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
+
+      ! Interpola rho a ir_fine_scl
+   rho_fine = rho(1) + (rho(irads) - rho(1)) * [(irr, irr=0,ir_fine_scl-1)] / (ir_fine_scl - 1)
    do irr = 1, ir_fine_scl
-      r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1)) / real(ir_fine_scl - 1) ! Interpola rho a ir_fine_scl
-      ! ra = sqrt(r_pt); ra2 = ra**2; ra3 = ra**3; ra4 = ra**4; ra5 = ra**5; ra6 = ra**6
-      iota_r(irr) = curv2(r_pt, irads, rho, iotac, ypi, sigma_spl)
+      iota_r(irr) = curv2(rho_fine(irr), irads, rho, iotac, ypi, sigma_spl)
+   end do
 
-      if (ion_profile .eq. 0) then
-         ion_density(irr) = (iota_r(irr) / iotac(1))**2   !profile that lines up gaps
-      else if (ion_profile .eq. 1) then
-         ion_density(irr) = nion(1) + r_pt * nion(2) + nion(3) * (r_pt**2)&
-         & + nion(4) * (r_pt**3) + nion(5) * (r_pt**4) + nion(6) * (r_pt**5)&
-         & + nion(7) * (r_pt**6) + nion(8) * (r_pt**7) + nion(9) * (r_pt**8)&
-         & + nion(10) * (r_pt**9)
-      else if (ion_profile .eq. 2) then
-         ion_density(irr) = 1.d0
-      else if (ion_profile .eq. 3) then
-         ion_density(irr) = (1. - aion * (r_pt**bion))**cion
-      end if
+   select case (ion_profile)
+      case (0)
+         ion_density = (iota_r / iotac(1))**2
+      case (1)
+         ion_density = poly_eval(rho_fine, nion)
+      case (2)
+         ion_density = 1._r8
+      case (3)
+         ion_density = (1. - aion * (rho_fine**bion))**cion
+   end select
+   
+   mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
 
-      mu0_rho_ion(irr) = MU_0 * mass_ion * ion_density_0&
-      & * ion_density(irr) * scale_khz
-      va = sqrt(bfavg**2 / (mu0_rho_ion(irr) / scale_khz))
-      if (mype .eq. 0)&
-      &write (9, 67) r_pt, ion_density_0 * ion_density(irr), &
-      &iota_r(irr), va
-   end do     !irr = 1,ir_fine_scl
+   if (mype .eq. 0) call write_ion_profile
+
+   ! do irr=1, ir_fine_scl
+   !    va = sqrt(bfavg**2 / (mu0_rho_ion(irr) / scale_khz))
+   !    if (mype .eq. 0) then
+   !       write (9, fmt_ion_profile) rho_fine(irr), ion_density_0 * ion_density(irr), iota_r(irr), va
+   !    end if
+   ! end do
+
    !   Interpolate 1/iota for lrfp = true option
    ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
-   call curv1(irads, rho, 1._r8/iotac, sp1, sp2, ispl_opt, ypi, &
-   &tempi, sigma_spl, ierr_spl)
+   call curv1(irads, rho, 1._r8/iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
    do irr = 1, ir_fine_scl
-      r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
-      & / real(ir_fine_scl - 1)
-      iota_r_inv(irr) = curv2(r_pt, irads, rho, 1._r8/iotac, ypi, sigma_spl)
-   end do     !irr = 1,ir_fine_scl
+      ! r_pt = rho(1) + real(irr - 1) * (rho(irads) - rho(1))&
+      ! & / real(ir_fine_scl - 1)
+      iota_r_inv(irr) = curv2(rho_fine(irr), irads, rho, 1._r8/iotac, ypi, sigma_spl)
+   end do
 
-   if (ierr_spl .ne. 0) write (*, '("spline error 1",i3)') ierr_spl
-67 format(e12.5, 3(3x, e12.5))
+   if (ierr_spl .ne. 0) then
+      write (*, '("spline error 1",i3)') ierr_spl
+   end if
+
+! 67 format(e12.5, 3(3x, e12.5))
    do i = 1, izt
       do j = 1, ith
          !
@@ -267,7 +272,7 @@ program tae_continua
          end do     !irr = 1,ir_fine_scl
       end do     !j=1,ith
    end do     !i=1,izt
-   close (unit = 9)
+   ! close (unit = 9)
    !
    !
    !     Fine_scale arrays and spline fits finished
