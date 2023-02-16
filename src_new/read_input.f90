@@ -9,14 +9,20 @@ module input
 contains
 
    subroutine read_tae_data_boozer
-      use globals, only: irads, lrfp, rho, rho_fine, iotac, izt, ith, theta_tae, zeta_tae,&
+      use globals, only: izt, ith, irads, lrfp, rho, rho_fine, iotac, theta_tae, zeta_tae,&
          rjacob, phipc, bfield, gsssup, bfavg, ir_fine_scl
 
-      integer :: ir, i, j, nn(irads)
-      real(r8) :: dum1, dum2,  dm1, dm2, dm3, dm4, dm5
+      integer :: ir, i, j, nn(irads), istat
+      real(r8) :: dum1, dum2, dm1, dm2, dm3, dm4, dm5
 
       character(len=*), parameter :: fmt_irad = '(1x,i3,4(2x,e15.7))'
       character(len=*), parameter :: fmt_ithz = '(1x,4(e24.12,2x),e24.12)'
+
+      allocate (bfield(izt, ith, irads), stat = istat)
+      allocate (gsssup(izt, ith, irads), stat = istat)
+      allocate (rjacob(izt, ith, irads), stat = istat)
+      allocate (theta_tae(ith), stat = istat)
+      allocate (zeta_tae(izt), stat = istat)
 
       open (unit=20, file="tae_data_boozer", status="old")
 
@@ -100,9 +106,11 @@ contains
       open (unit=20, file="fourier.dat", status="old")
       read (20, *) nfp, ith, izt, mode_family
       read (20, *) ntors
+
       allocate (nw(ntors), stat=istat)
       allocate (mwl(ntors), stat=istat)
       allocate (mwu(ntors), stat=istat)
+      
       do i = 1, ntors
          read (20, *) nw(i), mwl(i), mwu(i)
       end do

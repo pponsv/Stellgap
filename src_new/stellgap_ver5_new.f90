@@ -17,44 +17,34 @@ program tae_continua
 
    external dggev, dsygv, dsygvx ! LAPACK subroutines
 
-   integer, parameter :: iopt = 1
-
-   integer :: ir, irr, il, iu
-   real(r8), dimension(:), allocatable :: f1_nm, f3a_nm, f3b_nm, f3c_nm, bsupth_tmp, bsupzt_tmp
-   real(r8), dimension(:, :), allocatable :: f1, f3a, &
-   &f3b, f3c
-
    !!!!!!!  PRUEBAS
 
 
 
    !!!!!!!  END PRUEBAS
 
-   real(r8), allocatable :: beta(:), aux(:), eig_vect(:)
-   real(r8), allocatable :: amat(:, :), &
-   &bmat(:, :), z_r(:, :), vr(:, :), vl(:, :)
-   real(r8), allocatable :: omega(:), work(:), alfr(:), &
-   &alfi(:)
-   complex*16, allocatable :: alpha(:)
+   integer, parameter :: iopt = 1
 
-   real(r8), dimension(:), allocatable :: sp_fit
-   ! real(r8), dimension(:), allocatable :: nsurf, iotac,&
-   ! &phipc, rho, sp_fit, b2, iotac_inv
-   real(r8) :: sp1, sp2, sigma_spl, r_pt
-
-   real(r8), dimension(:), allocatable :: yp, temp, &
-   &ypi, tempi
-
-   real(r8) :: eig_max, ccci, scsi, &
-      egl, egu, abstol, f1_avg, f3_avg
-   integer :: ispl_opt, ierr_spl, naux
-   ! integer :: numrads
+   integer :: ir, irr, il, iu
+   integer :: ispl_opt, ierr_spl
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
    integer :: m_emax, n_emax, isym_opt
    integer :: ldvl, ldvr, lwork, info, m_red
-   integer, allocatable :: ifail(:), iwork(:)
-   logical :: cyl
+   integer, allocatable, dimension(:) :: ifail, iwork
+
+   real(r8) :: sp1, sp2, sigma_spl
+   real(r8) :: eig_max, ccci, scsi, egl, egu, abstol, f1_avg, f3_avg
+
+   real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
+   real(r8), allocatable, dimension(:) :: beta, eig_vect, omega, work, alfr, alfi
+   real(r8), allocatable, dimension(:) :: yp, temp, ypi, tempi
+
+   real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
+   real(r8), allocatable, dimension(:,:) :: amat, bmat, vr, vl
+   
+   complex*16, allocatable :: alpha(:)
+
    character*1 jobz
 
    !  START PROGRAM
@@ -71,29 +61,29 @@ program tae_continua
    allocate (mu0_rho_ion(ir_fine_scl), &
       ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
-   allocate (iotac(irads), phipc(irads), sp_fit(irads), stat = istat)
-   allocate (yp(3*irads), temp(3*irads), ypi(3*irads), &
-      tempi(3*irads), stat = istat)
+   allocate (iotac(irads), phipc(irads), stat = istat)
+   allocate (yp(3*irads), temp(3*irads), ypi(3*irads), tempi(3*irads), stat = istat)
 
    jobz = 'V'
 
    if (ipos_def_sym) isym_opt = 1
    if (.NOT. ipos_def_sym) isym_opt = 0
 
-   !    Generate Fourier arrays
+   !    Generate Fourier arrays - TODO CHANGE
    call trig_array
    call convolution_array
 
-   naux = 10 * mn_col
-   ! mu0 = 2.d-7*TWOPI
+   ! naux = 10 * mn_col
    scale_khz = (1.d+3 * TWOPI)**2
-   ldvl = mn_col; ldvr = mn_col; lwork = 20 * mn_col
 
-   allocate (aux(naux), stat = istat)
+   ldvl = mn_col
+   ldvr = mn_col
+   lwork = 20 * mn_col
+
+   ! allocate (aux(naux), stat = istat)
    allocate (alpha(mn_col), stat = istat)
    allocate (beta(mn_col), stat = istat)
    allocate (eig_vect(mn_col), stat = istat)
-   allocate (z_r(mn_col, mn_col), stat = istat)
    allocate (omega(mn_col), stat = istat)
    allocate (amat(mn_col, mn_col), stat = istat)
    allocate (bmat(mn_col, mn_col), stat = istat)
@@ -104,24 +94,11 @@ program tae_continua
    allocate (alfi(mn_col), stat = istat)
    allocate (vl(mn_col, mn_col), stat = istat)
    allocate (vr(mn_col, mn_col), stat = istat)
-   allocate (bfield(izt, ith, irads), stat = istat)
-   allocate (gsssup(izt, ith, irads), stat = istat)
-   allocate (rjacob(izt, ith, irads), stat = istat)
-   ! allocate (bsupth(izt, ith, irads), stat = istat)
-   ! allocate (bsupzt(izt, ith, irads), stat = istat)
-   ! allocate (bfield_lrg(izt, ith, ir_fine_scl), stat = istat)
-   ! allocate (gsssup_lrg(izt, ith, ir_fine_scl), stat = istat)
-   ! allocate (bsupth_lrg(izt, ith, ir_fine_scl), stat = istat)
-   ! allocate (bsupzt_lrg(izt, ith, ir_fine_scl), stat = istat)
-   ! allocate (rjacob_lrg(izt, ith, ir_fine_scl), stat = istat)
-   allocate (theta_tae(ith), stat = istat)
-   allocate (zeta_tae(izt), stat = istat)
+
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
    allocate (f3b_nm(mnmx), stat = istat)
    allocate (f3c_nm(mnmx), stat = istat)
-   allocate (bsupth_tmp(nznt), stat = istat)
-   allocate (bsupzt_tmp(nznt), stat = istat)
    allocate (f1(izt, ith), stat = istat)
    allocate (f3a(izt, ith), stat = istat)
    allocate (f3b(izt, ith), stat = istat)
@@ -143,7 +120,7 @@ program tae_continua
    call write_modes(mnmx = mnmx, mn_col = mn_col, rm = rm, rn = rn, im_col = im_col, in_col = in_col)
 
    !
-   !   Make spline fits and fill in fine_radius_scale arrays
+   !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
    !
    ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
    call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
@@ -377,7 +354,8 @@ program tae_continua
       mn_col, ir_fine_scl
 
    call trg_deallocate
-   deallocate (alpha, beta, aux)
+   ! deallocate (alpha, beta, aux)
+   deallocate (alpha, beta)
 
    call write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
 
