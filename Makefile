@@ -16,3 +16,6 @@ build:
 
 clean:
 	cmake --build ./build --target clean
+
+build_all:
+	cmake --build ./build --target all
