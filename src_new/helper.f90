@@ -1,5 +1,7 @@
 module helper
+
    use kind_spec, only: r8
+
    implicit none
 
 contains
@@ -16,6 +18,7 @@ contains
       end do
    end function outer
 
+
    function poly_eval(x, coefs) result(out)
       real(r8), intent(in) :: x(:), coefs(:)
       real(r8) :: out(size(x))
@@ -28,30 +31,41 @@ contains
 
    end function poly_eval
 
+
    function interp_3d_s(in, s, s_fine) result(out)
-      use fitpack, only: curv1, curv2
+      ! use fitpack, only: curv1, curv2
       real(r8), intent(in) :: in(:,:,:), s(:), s_fine(:)
 
       real(r8) :: out(size(in, dim=1), size(in, dim=2), size(s_fine))
 
-      real(r8) :: sp_fit(size(in, dim=3))
-      real(r8) :: sp1, sp2, yp(3*size(s)), temp(3*size(s)), sigma_spl
-      integer :: i, j, irr, ispl_opt, ierr_spl, irads
-
-      irads = size(s)
+      integer :: i, j
 
       do i = 1, size(in, dim=1)
          do j = 1, size(in, dim=2)
-            sp_fit = in(i, j, :)
-            ispl_opt = 3; ierr_spl = 0; sigma_spl = 0
-            call curv1(irads, s, sp_fit, sp1, sp2, ispl_opt, yp, temp, sigma_spl, ierr_spl)
-            if (ierr_spl .ne. 0) write (*, '("spline error 2",i3)') ierr_spl
-            do irr = 1, size(s_fine)
-               out(i, j, irr) = curv2(s_fine(irr), irads, s, sp_fit, yp, sigma_spl)
-            end do
+            out(i, j, :) = interp_wrap_rename(s, in(i, j, :), s_fine)
          end do
       end do
    end function interp_3d_s
+
+
+   function interp_wrap_rename(x, y, x_int) result(out)
+      use fitpack, only: curv1, curv2
+
+      real(r8), intent(in) :: x(:), y(size(x)), x_int(:)
+      real(r8) :: out(size(x_int))
+
+      real(r8) :: ypi(size(x)), temp(size(x))
+      integer :: ierr, i
+
+      call curv1(n=size(x), x=x, y=y, slp1=0._r8, slpn=0._r8, islpsw=3, &
+         yp=ypi, temp=temp, sigma=0._r8, ierr=ierr)
+      do i = 1, size(x_int)
+         out(i) = curv2(x_int(i), size(x), x, y, ypi, sigma=0._r8)
+      end do
+      if (ierr .ne. 0) write (*, '("spline error 1",i3)') ierr
+
+   end function interp_wrap_rename
+
 
    subroutine write_tmp(a, b)
       real(r8) :: a(:), b(:)
@@ -63,6 +77,7 @@ contains
       end do
       close(99)
    end subroutine write_tmp
+
 
    function real_linspace(xi, xf, np) result(out)
 
@@ -77,6 +92,7 @@ contains
       end do
    end function real_linspace
 
+   
    function real_linspace_nolast(xi, xf, np) result(out)
       !       Makes a linearly spaced vector between xi, xf
       !       (xf excluded) with np elements
@@ -93,6 +109,8 @@ contains
    end function real_linspace_nolast
 
    subroutine lingrid(in1, in2, out1, out2)
+      !  Makes a flattened meshgrid from in1 and in2
+
       real(r8), intent(in) :: in1(:), in2(:)
       real(r8), intent(out) :: out1(size(in1)*size(in2)), out2(size(in1)*size(in2))
 

@@ -19,13 +19,15 @@ program tae_continua
 
    !!!!!!!  PRUEBAS
 
-
+   real(r8), allocatable :: tmp(:)
 
    !!!!!!!  END PRUEBAS
 
    integer, parameter :: iopt = 1
 
-   integer :: ir, irr, il, iu, lg
+   !  Dummy integers for loops
+
+   integer :: ir, irr, il, iu, lg, istat, i, j, mn
    integer :: ispl_opt, ierr_spl
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
@@ -52,14 +54,16 @@ program tae_continua
    cyl = .false.
    lrfp = .false.
 
+   !  Read command-line arguments
    call read_args
 
+   !  Read plasma.dat
    call read_plasma_dat
 
+   !  Read fourier.dat
    call read_fourier_dat
 
-   allocate (mu0_rho_ion(ir_fine_scl), &
-      ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
+   allocate (ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
    allocate (iotac(irads), stat = istat)
    ! allocate (yp(3*irads), stat = istat)
@@ -73,6 +77,7 @@ program tae_continua
 
    !    Generate Fourier arrays - TODO CHANGE
    call trig_array
+
    call convolution_array
 
    ! naux = 10 * mn_col
@@ -112,52 +117,41 @@ program tae_continua
 
    write (*, *) izt, ith, irads, mnmx, ith*izt, mn_col
 
-   open (unit = 21, file = "alfven_spec", status = "unknown")
-   open (unit = 8, file = "coef_arrays", status = "unknown")
-
+   
    !    Boozer coordinates input - new ae-mode-structure input
    call read_tae_data_boozer
-
+   
    !    Record equilibrium and eigenfunction Fourier mode list
    call write_modes
-
+   
    !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
    !
-   ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
-   call curv1(irads, rho, iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
-   do irr = 1, ir_fine_scl
-      iota_r(irr) = curv2(rho_fine(irr), irads, rho, iotac, ypi, sigma_spl)
-   end do
-
+   iota_r = interp_wrap_rename(rho, iotac, rho_fine)
+   iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
+   
    select case (ion_profile)
-    case (0)
+   case (0)
       ion_density = (iota_r / iotac(1))**2
-    case (1)
+   case (1)
       ion_density = poly_eval(rho_fine, nion)
-    case (2)
+   case (2)
       ion_density = 1._r8
-    case (3)
+   case (3)
       ion_density = (1. - aion * (rho_fine**bion))**cion
    end select
-
+   
    mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
-
+   
    call write_ion_profile
-
-   !   Interpolate 1/iota for lrfp = true option
-   ispl_opt = 3; ierr_spl = 0; sigma_spl = 0.
-   call curv1(irads, rho, 1._r8/iotac, sp1, sp2, ispl_opt, ypi, tempi, sigma_spl, ierr_spl)
-   do irr = 1, ir_fine_scl
-      iota_r_inv(irr) = curv2(rho_fine(irr), irads, rho, 1._r8/iotac, ypi, sigma_spl)
-   end do
-
-   if (ierr_spl .ne. 0) write (*, '("spline error 1",i3)') ierr_spl
-
-
+   
+   !  Interpolate field, jacobian and gss
    bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
    rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
+   
+   open (unit = 21, file = "alfven_spec", status = "unknown")
+   open (unit = 8, file = "coef_arrays", status = "unknown")
 
    !  Main loop
    do ir = (1), (ir_fine_scl)
@@ -352,8 +346,7 @@ program tae_continua
    close (unit = 8)
 
    !  Write and deallocate
-   write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') &
-      mn_col, ir_fine_scl
+   write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') mn_col, ir_fine_scl
 
    call trg_deallocate
    ! deallocate (alpha, beta, aux)

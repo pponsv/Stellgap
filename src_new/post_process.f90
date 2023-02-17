@@ -43,16 +43,13 @@ contains
       do ir = 1, irads
          do i = 1, nang2
             if (isym_pos .eq. 1) then
-               read (4, '(2(e15.7,2x),i4,2x,i4)') r_pt, omega(ir, i),&
-               &m_emax, n_emax
+               read (4, '(2(e15.7,2x),i4,2x,i4)') r_pt, omega(ir, i), m_emax, n_emax
                temp(i) = omega(ir, i)**2
-               write (7, '(2(e15.7,2x),i4,2x,i4)') r_pt,&
-               &omega(ir, i)*fnorm, m_emax, n_emax
+               write (7, '(2(e15.7,2x),i4,2x,i4)') r_pt, omega(ir, i)*fnorm, m_emax, n_emax
 
             else if (isym_pos .eq. 0) then
-               read (4, '(4(e15.7,2x),i4,2x,i4)') r_pt,&
-               &alpha_r(ir, i),&
-               &alpha_i(ir, i), beta(ir, i), m_emax, n_emax
+               read (4, '(4(e15.7,2x),i4,2x,i4)') r_pt, alpha_r(ir, i), alpha_i(ir, i), &
+                  beta(ir, i), m_emax, n_emax
                !   c               alpha_r(ir,i) = abs(alpha_r(ir,i))
                if (beta(ir, i) .gt. 0.d0) then
                   lambda_real = alpha_r(ir, i)/beta(ir, i)
@@ -69,9 +66,8 @@ contains
                omega_i(ir, i) = imag(cdsqrt(omega2(ir, i)))
                if (omega_i(ir, i) .eq. 0.d0) then
                   if (r_pt .lt. 0.99) then
-                     write (7, '(2(e15.7,2x),i4,2x,i4)') r_pt,&
-                     &omega_r(ir, i)*fnorm,&
-                     &m_emax, n_emax
+                     write (7, '(2(e15.7,2x),i4,2x,i4)') r_pt, omega_r(ir, i)*fnorm, &
+                        m_emax, n_emax
                   end if
                end if
 
@@ -92,16 +88,11 @@ contains
    subroutine post_process_snd
 
       real(r8), allocatable :: omega(:, :)
-      real(r8), allocatable :: alpha_r(:, :), alpha_i(:, :),&
-      &beta(:, :), omega_r(:, :), omega_i(:, :)
+      real(r8), allocatable :: alpha_r(:, :), alpha_i(:, :), beta(:, :), omega_r(:, :), omega_i(:, :)
       complex*16, allocatable :: omega2(:, :)
       real(r8), allocatable :: temp(:)
-      real(r8) :: r_pt, lam_min,&
-      &lam_max, cond_no, lambda_real, xnrm,&
-      &phi_norm, psi_norm, fnorm, lambda_imag
-      integer :: nang2, irads, iopt, m_emax, n_emax,&
-      &itot, m_emax_psi, n_emax_psi, isym_pos, istat,&
-      &ir, i
+      real(r8) :: r_pt, lam_min,lam_max, cond_no, lambda_real, xnrm,phi_norm, psi_norm, fnorm, lambda_imag
+      integer :: nang2, irads, iopt, m_emax, n_emax, itot, m_emax_psi, n_emax_psi, isym_pos, istat, ir, i
       call system("rm all_alfven_spec")
       call system("cat alfven_spec* > all_alfven_spec")
       open (unit=4, file="all_alfven_spec", status="old")

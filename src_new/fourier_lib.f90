@@ -12,7 +12,8 @@ module fourier_lib
 
    ! real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
 
-   integer :: i, j, m, n, mn, istat, sin_type, cos_type
+   ! integer :: i, j, m, n, mn, istat
+   integer :: sin_type, cos_type
    !   Equilibrium coefficient arrays
    ! real(r8), allocatable :: rn(:), rm(:)
    real(r8), allocatable :: fnm(:), f(:), anm(:)
@@ -20,18 +21,12 @@ module fourier_lib
    real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
 
 
-
-   !   Eigenfunction arrays,variables
-
-   ! real(r8), allocatable :: rn_col(:), rm_col(:)
-   ! integer, allocatable :: in_col(:), im_col(:)
-   ! integer, allocatable :: nw(:), mwl(:), mwu(:)
-
 contains
 
    subroutine trig_array
       use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor
-      integer :: istat, nl
+
+      integer :: istat, nl, i, n, m, mn
       real(r8) :: dum, dnorm, arg
       real(r8) :: zetas(izt), thetas(ith)
       real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith)
@@ -79,7 +74,7 @@ contains
 
    subroutine convolution_array
       use globals, only: mn_col
-      integer :: istat, count
+      integer :: istat, count, i, m, n
       !     First, count the number of modes to be used
       count = 0
       do i = 1, ntors
@@ -189,7 +184,6 @@ contains
    !
    !
    subroutine ccc(result, i, j, k)
-      integer :: istat
       real(r8), parameter :: zero = 0, one = 1, &
       &two = 2, four = 4
       real(r8) :: result
@@ -244,7 +238,6 @@ contains
    !
    !
    subroutine css(result, k, i, j)
-      integer :: istat
       real(r8), parameter :: one = 1, neg_one = -1, zero = 0, &
       &two = 2, neg_two = -2
       integer :: i, j, k

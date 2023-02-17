@@ -12,6 +12,7 @@ rmlink:
 	rm -f ~/.local/bin/xmetric
 
 build:
+	mkdir -p ./build
 	cmake --build ./build --target xstgap_new
 
 clean:

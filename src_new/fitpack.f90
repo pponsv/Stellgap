@@ -1,8 +1,11 @@
 module fitpack
 
-   use kind_spec, only: r8
-
+   
    implicit none
+
+   private :: r8
+   
+   integer, parameter :: r8 = selected_real_kind(12, 100)
 
 contains
 
@@ -296,7 +299,7 @@ contains
       &), temp(1, 8), temp(1, 9), ierr)
       return
    end subroutine curvs
-   
+
    function curv2(t, n, x, y, yp, sigma)
 
 !-----------------------------------------------
