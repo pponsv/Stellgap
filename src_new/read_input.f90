@@ -99,8 +99,7 @@ contains
 
 
    subroutine read_fourier_dat
-      use globals, only: nfp, ith, izt, mode_family, ntors, nw, mwl, mwu, mpol, ntor,&
-         nznt, mnmx
+      use globals, only: nfp, ith, izt, mode_family, ntors, nw, mwl, mwu, mpol, ntor, mnmx
       integer :: i, istat
 
       open (unit=20, file="fourier.dat", status="old")
@@ -118,7 +117,8 @@ contains
 
       mpol = ith*2/5
       ntor = izt*2/5 ! Done to avoid aliasing issues
-      nznt = ith*izt
+
+      ! nznt = ith*izt
       mnmx = (2*ntor + 1)*mpol - ntor
 
    end subroutine read_fourier_dat

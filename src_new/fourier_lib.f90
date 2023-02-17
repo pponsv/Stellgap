@@ -6,23 +6,21 @@ module fourier_lib
 
    use kind_spec
    use globals
+   use helper
 
    implicit none
 
-   ! integer :: ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family
    real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
-   integer :: i, j, lg, nu, nl, m, n, mn, istat, sin_type, cos_type
+
+   integer :: i, j, m, n, mn, istat, sin_type, cos_type
    !   Equilibrium coefficient arrays
    real(r8), allocatable :: thtgrd(:), ztgrd(:), rn(:), rm(:)
    real(r8), allocatable :: fnm(:), f(:), anm(:)
    real(r8), allocatable :: cos_ar(:, :), sin_ar(:, :)
    real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
 
-   !    The subset_eq flag allows one to just request a bracketed subset of
-   !     eigenvalues, rather than all eigenvalues. This option has not been
-   !     developed beyond the call. Initial tests have not indicated it
-   !     speeds things up.
-   logical, parameter :: subset_eq = .false.
+
+   
    !   Eigenfunction arrays,variables
    integer :: mn_col, ith_col, izt_col
    real(r8), allocatable :: rn_col(:), rm_col(:)
@@ -32,65 +30,48 @@ module fourier_lib
    ! integer, allocatable :: nw(:), mwl(:), mwu(:)
 
 contains
-   !
-   ! subroutine readin
-   !    integer :: i, istat
-   !    open (unit = 20, file = "fourier.dat", status = "old")
-   !    read (20, *) nfp, ith, izt, mode_family
-   !    mpol = ith * 2 / 5; ntor = izt * 2 / 5 ! Done to avoid aliasing issues
-   !    nznt = ith * izt; mnmx = (2 * ntor + 1) * mpol - ntor
-   !    read (20, *) ntors
-   !    allocate (nw(ntors), stat = istat)
-   !    allocate (mwl(ntors), stat = istat)
-   !    allocate (mwu(ntors), stat = istat)
-   !    do i = 1, ntors
-   !       read (20, *) nw(i), mwl(i), mwu(i)
-   !    end do
-   !    close (unit = 20)
-   ! end subroutine readin
-   !
-   !
+
    subroutine trig_array
-      integer :: istat
+      use globals, only: zetas, thetas, izt, ith
+      integer :: istat, nl
       real(r8) :: dum, dnorm, arg
-      allocate (thtgrd(nznt), stat = istat)
-      allocate (ztgrd(nznt), stat = istat)
+      !PRUEBA
+      ! real(r8) :: zetas(izt), thetas(ith)!, tmp1(izt*ith), tmp2(izt*ith)
+      ! real(r8), allocatable :: tmp1(:), tmp2(:)
+      !END PRUEBA
+
       allocate (rm(mnmx), stat = istat)
       allocate (rn(mnmx), stat = istat)
       allocate (fnm(mnmx), stat = istat)
-      allocate (f(nznt), stat = istat)
+      allocate (f(ith*izt), stat = istat)
       allocate (anm(mnmx), stat = istat)
-      allocate (cos_ar(nznt, mnmx), stat = istat)
-      allocate (sin_ar(nznt, mnmx), stat = istat)
-      allocate (cos_toF(nznt, mnmx), stat = istat)
-      allocate (sin_toF(nznt, mnmx), stat = istat)
+      allocate (cos_ar(ith*izt, mnmx), stat = istat)
+      allocate (sin_ar(ith*izt, mnmx), stat = istat)
+      allocate (cos_toF(ith*izt, mnmx), stat = istat)
+      allocate (sin_toF(ith*izt, mnmx), stat = istat)
+
       !    Generate theta, zeta grid
-      lg = 0
-      do i = 1, izt
-         do j = 1, ith
-            lg = lg + 1
-            ztgrd(lg) = twopi * real(i - 1) / (real(nfp * izt))
-            thtgrd(lg) = twopi * real(j - 1) / real(ith)
-         end do
-      end do
+      zetas = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
+      thetas = real_linspace_nolast(0._r8, 2*PI, ith)
+      call lingrid(zetas, thetas, ztgrd, thtgrd)
+      
       !    Generate Fourier mode distribution
       mn = 0
-      nu = ntor
       do m = 0, mpol - 1
          nl = -ntor
          if (m .eq. 0) nl = 0
-         do n = nl, nu
+         do n = nl, ntor
             mn = mn + 1
             rm(mn) = real(m)
             rn(mn) = real(n * nfp)
          end do
       end do
-      do i = 1, nznt ! =ith*izt
+      do i = 1, ith*izt ! =ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
             cos_ar(i, mn) = cos(arg)
             sin_ar(i, mn) = sin(arg)
-            dnorm = 2. / real(nznt)
+            dnorm = 2. / real(ith*izt)
             dum = abs(rn(mn)) + abs(rm(mn))
             if (nint(dum) .eq. 0) dnorm = .5 * dnorm
             cos_toF(i, mn) = cos_ar(i, mn) * dnorm

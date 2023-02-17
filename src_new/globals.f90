@@ -5,6 +5,13 @@ module globals
 
    implicit none
 
+   !    The subset_eq flag allows one to just request a bracketed subset of
+   !     eigenvalues, rather than all eigenvalues. This option has not been
+   !     developed beyond the call. Initial tests have not indicated it
+   !     speeds things up.
+   logical, parameter :: subset_eq = .false.
+   
+   logical, parameter :: ipos_def_sym = .false.
    logical :: lrfp ! If true: use reversed field pinch settings
    logical :: cyl  ! If true: cylindrical geometry???
 
@@ -12,7 +19,7 @@ module globals
    integer :: irads, ir_fine_scl
 
    !  read_fourier_dat
-   integer :: ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, mode_family
+   integer :: ith, izt, mpol, ntor, mnmx, ntors, nfp, mode_family
    integer, allocatable, dimension(:) :: nw, mwl, mwu
 
    !  read_plasma_dat
@@ -23,7 +30,7 @@ module globals
    real(r8) :: bfavg
    real(r8) :: scale_khz
 
-   real(r8), allocatable, dimension(:) :: rho, rho_fine
+   real(r8), allocatable, dimension(:) :: rho, rho_fine, zetas, thetas
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:) :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
 

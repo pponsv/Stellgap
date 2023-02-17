@@ -25,7 +25,7 @@ program tae_continua
 
    integer, parameter :: iopt = 1
 
-   integer :: ir, irr, il, iu
+   integer :: ir, irr, il, iu, lg
    integer :: ispl_opt, ierr_spl
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
@@ -74,7 +74,7 @@ program tae_continua
    call convolution_array
 
    ! naux = 10 * mn_col
-   scale_khz = (1.d+3 * TWOPI)**2
+   scale_khz = (1.d+3 * 2 * PI)**2
 
    ldvl = mn_col
    ldvr = mn_col
@@ -108,7 +108,7 @@ program tae_continua
    !
    !      write(*,*) trim(adjustl(outfile))
 
-   write (*, *) izt, ith, irads, mnmx, nznt, mn_col
+   write (*, *) izt, ith, irads, mnmx, ith*izt, mn_col
 
    open (unit = 21, file = "alfven_spec", status = "unknown")
    open (unit = 8, file = "coef_arrays", status = "unknown")

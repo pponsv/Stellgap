@@ -47,10 +47,10 @@ contains
       do mn = 1, mnmx     !loop over Fourier modes
          fnm(mn) = 0.
 !       dnorm = 2.*real(nfp)/real(nznt)
-         dnorm = 2./real(nznt)
+         dnorm = 2./real(ith*izt)
          dum = abs(rn(mn)) + abs(rm(mn))
          if (nint(dum) .eq. 0) dnorm = .5*dnorm
-         do i = 1, nznt      !loop over theta,zeta grid
+         do i = 1, ith*izt      !loop over theta,zeta grid
 !       arg = -rn(mn)*ztgrd(i) + rm(mn)*thtgrd(i)
             if (sin_type .eq. 1 .and. cos_type .eq. 0) then
                fnm(mn) = fnm(mn) + f(i)*sin_ar(i, mn)*dnorm
@@ -69,7 +69,7 @@ contains
 !    to values of function on a regularly spaced 2D grid
 !    [stored in array f(i=1,nznt)].
 !
-      do i = 1, nznt
+      do i = 1, ith*izt
          f(i) = 0.
          do mn = 1, mnmx
             if (sin_type .eq. 1 .and. cos_type .eq. 0) then
