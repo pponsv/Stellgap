@@ -38,11 +38,11 @@ program tae_continua
 
    real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
    real(r8), allocatable, dimension(:) :: beta, eig_vect, omega, work, alfr, alfi
-   real(r8), allocatable, dimension(:) :: yp, temp, ypi, tempi
+   real(r8), allocatable, dimension(:) :: ypi, tempi
 
    real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
    real(r8), allocatable, dimension(:,:) :: amat, bmat, vr, vl
-   
+
    complex*16, allocatable :: alpha(:)
 
    character*1 jobz
@@ -61,8 +61,10 @@ program tae_continua
    allocate (mu0_rho_ion(ir_fine_scl), &
       ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
       iota_r_inv(ir_fine_scl), stat = istat)
-   allocate (iotac(irads), phipc(irads), stat = istat)
-   allocate (yp(3*irads), temp(3*irads), ypi(3*irads), tempi(3*irads), stat = istat)
+   allocate (iotac(irads), stat = istat)
+   ! allocate (yp(3*irads), stat = istat)
+   allocate (ypi(3*irads), stat = istat)
+   allocate (tempi(3*irads), stat = istat)
 
    jobz = 'V'
 
@@ -117,7 +119,7 @@ program tae_continua
    call read_tae_data_boozer
 
    !    Record equilibrium and eigenfunction Fourier mode list
-   call write_modes(mnmx = mnmx, mn_col = mn_col, rm = rm, rn = rn, im_col = im_col, in_col = in_col)
+   call write_modes
 
    !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
@@ -157,7 +159,7 @@ program tae_continua
    rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
-   !  Main loop   
+   !  Main loop
    do ir = (1), (ir_fine_scl)
       !       write(*,*) ir
       !      do ir=1,ir_fine_scl
@@ -168,17 +170,17 @@ program tae_continua
       do i = 1, izt
          do j = 1, ith
             f1(i, j) = gsssup_lrg(i, j, ir) * rjacob_lrg(i, j, ir) / &
-            &(bfield_lrg(i, j, ir)**2)
+               (bfield_lrg(i, j, ir)**2)
             f1_avg = f1_avg + f1(i, j) / real(izt * ith)
             if (.not. lrfp) then
                f3c(i, j) = gsssup_lrg(i, j, ir) / &
-               &(rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
+                  (rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
                f3_avg = f3_avg + f3c(i, j) / real(izt * ith)
                f3b(i, j) = iota_r(ir) * f3c(i, j)
                f3a(i, j) = iota_r(ir) * f3b(i, j)
             else if (lrfp) then
                f3a(i, j) = gsssup_lrg(i, j, ir) / &
-               &(rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
+                  (rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
                f3b(i, j) = f3a(i, j) * iota_r_inv(ir)
                f3c(i, j) = f3b(i, j) * iota_r_inv(ir)
                f3_avg = f3_avg + f3a(i, j) / real(izt * ith)

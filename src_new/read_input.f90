@@ -10,10 +10,11 @@ contains
 
    subroutine read_tae_data_boozer
       use globals, only: izt, ith, irads, lrfp, rho, rho_fine, iotac, theta_tae, zeta_tae,&
-         rjacob, phipc, bfield, gsssup, bfavg, ir_fine_scl
+         rjacob, bfield, gsssup, bfavg, ir_fine_scl
 
       integer :: ir, i, j, nn(irads), istat
       real(r8) :: dum1, dum2, dm1, dm2, dm3, dm4, dm5
+      real(r8) :: phipc(irads)
 
       character(len=*), parameter :: fmt_irad = '(1x,i3,4(2x,e15.7))'
       character(len=*), parameter :: fmt_ithz = '(1x,4(e24.12,2x),e24.12)'

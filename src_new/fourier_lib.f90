@@ -47,7 +47,7 @@ contains
       allocate (sin_toF(ith*izt, mnmx), stat = istat)
 
       !    Generate theta, zeta grid
-      zetas = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
+      zetas  = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
       thetas = real_linspace_nolast(0._r8, 2*PI, ith)
       call lingrid(zetas, thetas, ztgrd, thtgrd)
 
@@ -63,7 +63,7 @@ contains
          end do
       end do
 
-      do i = 1, ith*izt ! =ith*izt
+      do i = 1, ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
             cos_ar(i, mn) = cos(arg)

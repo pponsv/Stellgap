@@ -7,15 +7,13 @@ module postprocess
 contains
 
    subroutine post_process
-      real(r8), allocatable :: omega(:, :),&
-      &alpha_r(:, :), alpha_i(:, :), beta(:, :),&
-      &omega_r(:, :), omega_i(:, :), temp(:)
-      complex*16, allocatable :: omega2(:, :)
-      real(r8) :: r_pt, lam_min, lambda_imag,&
-      &lam_max, cond_no, lambda_real, pi, fnorm
-      integer :: nang2, irads, iopt, m_emax, n_emax,&
-      &itot, isym_pos, istat, ir, i
-      pi = 4.*atan(1.d0)
+      integer :: nang2, irads, iopt, m_emax, n_emax, itot, isym_pos, istat, ir, i
+      real(r8) :: r_pt, lam_min, lambda_imag, lam_max, cond_no, lambda_real, fnorm
+      real(r8), allocatable, dimension(:) :: temp
+      real(r8), allocatable, dimension(:,:) :: omega, alpha_r, alpha_i, beta, &
+         omega_r, omega_i
+      complex*16, allocatable, dimension(:,:) :: omega2
+
       open (unit=4, file="alfven_spec", status="old")
       open (unit=7, file="alfven_post", status="unknown")
       open (unit=9, file="cond_no", status="unknown")
@@ -99,12 +97,11 @@ contains
       complex*16, allocatable :: omega2(:, :)
       real(r8), allocatable :: temp(:)
       real(r8) :: r_pt, lam_min,&
-      &lam_max, cond_no, lambda_real, pi, xnrm,&
+      &lam_max, cond_no, lambda_real, xnrm,&
       &phi_norm, psi_norm, fnorm, lambda_imag
       integer :: nang2, irads, iopt, m_emax, n_emax,&
       &itot, m_emax_psi, n_emax_psi, isym_pos, istat,&
       &ir, i
-      pi = 4.*atan(1.d0)
       call system("rm all_alfven_spec")
       call system("cat alfven_spec* > all_alfven_spec")
       open (unit=4, file="all_alfven_spec", status="old")
