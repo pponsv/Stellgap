@@ -1,7 +1,8 @@
 module fourier_lib_convolve
+
+   use kind_spec, only: r8
    use fourier_lib
    use fitpack
-   use kind_spec
    implicit none
 
 contains

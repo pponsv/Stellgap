@@ -17,5 +17,8 @@ build:
 clean:
 	cmake --build ./build --target clean
 
+clean_bld:
+	rm -rf bld/*
+
 build_all:
 	cmake --build ./build --target all

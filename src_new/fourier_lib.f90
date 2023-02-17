@@ -10,35 +10,31 @@ module fourier_lib
 
    implicit none
 
-   real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
+   ! real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
 
    integer :: i, j, m, n, mn, istat, sin_type, cos_type
    !   Equilibrium coefficient arrays
-   real(r8), allocatable :: thtgrd(:), ztgrd(:), rn(:), rm(:)
+   ! real(r8), allocatable :: rn(:), rm(:)
    real(r8), allocatable :: fnm(:), f(:), anm(:)
    real(r8), allocatable :: cos_ar(:, :), sin_ar(:, :)
    real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
 
 
-   
+
    !   Eigenfunction arrays,variables
-   integer :: mn_col, ith_col, izt_col
-   real(r8), allocatable :: rn_col(:), rm_col(:)
-   real(r8), allocatable :: rn2_col(:), rm2_col(:), rnm_col(:)
-   integer, allocatable :: in_col(:), im_col(:)
-   integer, allocatable :: in_col_aug(:), im_col_aug(:)
+
+   ! real(r8), allocatable :: rn_col(:), rm_col(:)
+   ! integer, allocatable :: in_col(:), im_col(:)
    ! integer, allocatable :: nw(:), mwl(:), mwu(:)
 
 contains
 
    subroutine trig_array
-      use globals, only: zetas, thetas, izt, ith
+      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor
       integer :: istat, nl
       real(r8) :: dum, dnorm, arg
-      !PRUEBA
-      ! real(r8) :: zetas(izt), thetas(ith)!, tmp1(izt*ith), tmp2(izt*ith)
-      ! real(r8), allocatable :: tmp1(:), tmp2(:)
-      !END PRUEBA
+      real(r8) :: zetas(izt), thetas(ith)
+      real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith)
 
       allocate (rm(mnmx), stat = istat)
       allocate (rn(mnmx), stat = istat)
@@ -54,7 +50,7 @@ contains
       zetas = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
       thetas = real_linspace_nolast(0._r8, 2*PI, ith)
       call lingrid(zetas, thetas, ztgrd, thtgrd)
-      
+
       !    Generate Fourier mode distribution
       mn = 0
       do m = 0, mpol - 1
@@ -66,6 +62,7 @@ contains
             rn(mn) = real(n * nfp)
          end do
       end do
+
       do i = 1, ith*izt ! =ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
@@ -81,6 +78,7 @@ contains
    end subroutine trig_array
 
    subroutine convolution_array
+      use globals, only: mn_col
       integer :: istat, count
       !     First, count the number of modes to be used
       count = 0
@@ -93,9 +91,6 @@ contains
       allocate (rn_col(mn_col), stat = istat)
       allocate (im_col(mn_col), stat = istat)
       allocate (in_col(mn_col), stat = istat)
-      allocate (rm2_col(mn_col), stat = istat)
-      allocate (rn2_col(mn_col), stat = istat)
-      allocate (rnm_col(mn_col), stat = istat)
       !     Create mode number arrays needed for eigenfunction
       count = 0
       do n = 1, ntors
@@ -105,9 +100,6 @@ contains
             rn_col(count) = real(nw(n))
             im_col(count) = m
             in_col(count) = nw(n)
-            rm2_col(count) = rm_col(count) * rm_col(count)
-            rn2_col(count) = rn_col(count) * rn_col(count)
-            rnm_col(count) = rm_col(count) * rn_col(count)
          end do
       end do
       mn_col = count
@@ -116,7 +108,6 @@ contains
    !
    !
    subroutine scs_convolve(ans, m1, n1, m2, n2, meq, neq)
-      integer :: istat
       real(r8) :: tht_int1, tht_int2, tht_int3, tht_int4, &
       &zeta_int1, zeta_int2, zeta_int3, zeta_int4, ans
       integer :: m1, m2, n1, n2, meq, neq
@@ -145,10 +136,10 @@ contains
       call css(zeta_int3, n1, n2, neq)
       call css(tht_int4, m1, m2, meq)
       call css(zeta_int4, n2, n1, neq)
-      ans = tht_int1 * zeta_int1 * sm1 * sm2&
-      & + tht_int2 * zeta_int2 * sn1 * sn2&
-      & - tht_int3 * zeta_int3 * sm1 * smeq * sn2 * sneq&
-      & - tht_int4 * zeta_int4 * sm2 * smeq * sn1 * sneq
+      ans = tht_int1 * zeta_int1 * sm1 * sm2 &
+         + tht_int2 * zeta_int2 * sn1 * sn2 &
+         - tht_int3 * zeta_int3 * sm1 * smeq * sn2 * sneq &
+         - tht_int4 * zeta_int4 * sm2 * smeq * sn1 * sneq
       m1 = sm1 * m1; n1 = sn1 * n1
       m2 = sm2 * m2; n2 = sn2 * n2
       meq = smeq * meq; neq = sneq * neq
@@ -282,9 +273,8 @@ contains
    !
    !
    subroutine trg_deallocate
-      deallocate (thtgrd, ztgrd, rm, rn, cos_ar, sin_ar, f, fnm, anm, &
-      &rm_col, rn_col, im_col, in_col, &
-      &rm2_col, rn2_col, rnm_col)
+      deallocate (rm, rn, cos_ar, sin_ar, f, fnm, anm, &
+      &rm_col, rn_col, im_col, in_col)
    end subroutine trg_deallocate
 
 end module fourier_lib

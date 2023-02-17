@@ -7,11 +7,11 @@ module postprocess
 contains
 
    subroutine post_process
-      real(rprec), allocatable :: omega(:, :),&
+      real(r8), allocatable :: omega(:, :),&
       &alpha_r(:, :), alpha_i(:, :), beta(:, :),&
       &omega_r(:, :), omega_i(:, :), temp(:)
       complex*16, allocatable :: omega2(:, :)
-      real(rprec) :: r_pt, lam_min, lambda_imag,&
+      real(r8) :: r_pt, lam_min, lambda_imag,&
       &lam_max, cond_no, lambda_real, pi, fnorm
       integer :: nang2, irads, iopt, m_emax, n_emax,&
       &itot, isym_pos, istat, ir, i
@@ -93,12 +93,12 @@ contains
 
    subroutine post_process_snd
 
-      real(rprec), allocatable :: omega(:, :)
-      real(rprec), allocatable :: alpha_r(:, :), alpha_i(:, :),&
+      real(r8), allocatable :: omega(:, :)
+      real(r8), allocatable :: alpha_r(:, :), alpha_i(:, :),&
       &beta(:, :), omega_r(:, :), omega_i(:, :)
       complex*16, allocatable :: omega2(:, :)
-      real(rprec), allocatable :: temp(:)
-      real(rprec) :: r_pt, lam_min,&
+      real(r8), allocatable :: temp(:)
+      real(r8) :: r_pt, lam_min,&
       &lam_max, cond_no, lambda_real, pi, xnrm,&
       &phi_norm, psi_norm, fnorm, lambda_imag
       integer :: nang2, irads, iopt, m_emax, n_emax,&

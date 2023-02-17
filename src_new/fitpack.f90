@@ -1,5 +1,6 @@
 module fitpack
-   use kind_spec
+
+   use kind_spec, only: r8
 
    implicit none
 
@@ -11,13 +12,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, islpsw, ierr
-      real(kind=rprec) slp1, slpn, sigma
-      real(kind=rprec), dimension(n) :: x, y, yp, temp
+      real(kind=r8) slp1, slpn, sigma
+      real(kind=r8), dimension(n) :: x, y, yp, temp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, np1, i, ibak
-      real(kind=rprec) :: sigmap, slpp1, delx1, delx2,&
+      real(kind=r8) :: sigmap, slpp1, delx1, delx2,&
       &c1, c2, c3, slppn, delxn,&
       &delxnm, dx1, diag1, sdiag1, dx2, diag2, sdiag2, diag
 !-----------------------------------------------
@@ -181,9 +182,9 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, isw, ierr
-      real(kind=rprec) s, eps, sigma
-      real(kind=rprec), dimension(n) :: x, y, d, ys, ysp
-      real(kind=rprec), dimension(n, 9) :: temp
+      real(kind=r8) s, eps, sigma
+      real(kind=r8), dimension(n) :: x, y, d, ys, ysp
+      real(kind=r8), dimension(n, 9) :: temp
 !-----------------------------------------------
 !
 !
@@ -302,13 +303,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, sigma, curv2
-      real(kind=rprec), dimension(n) :: x, y, yp
+      real(kind=r8) t, sigma, curv2
+      real(kind=r8), dimension(n) :: x, y, yp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: sigmap, del1, del2, dels, sum, sigdel,&
+      real(kind=r8) :: sigmap, del1, del2, dels, sum, sigdel,&
       &ss, dummy, s1, s2
 !-----------------------------------------------
 !   E x t e r n a l   F u n c t i o n s
@@ -393,13 +394,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, sigma, curvd
-      real(kind=rprec), dimension(n) :: x, y, yp
+      real(kind=r8) t, sigma, curvd
+      real(kind=r8), dimension(n) :: x, y, yp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: sigmap, del1, del2, dels, sum, sigdel,&
+      real(kind=r8) :: sigmap, del1, del2, dels, sum, sigdel,&
       &ss, dummy, c1, c2
 !-----------------------------------------------
 !   E x t e r n a l   F u n c t i o n s
@@ -484,13 +485,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) xl, xu, sigma, curvi
-      real(kind=rprec), dimension(n) :: x, y, yp
+      real(kind=r8) xl, xu, sigma, curvi
+      real(kind=r8), dimension(n) :: x, y, yp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: ilm1, il, ium1, iu, ilp1, i
-      real(kind=rprec) :: sigmap, xxl, xxu, ssign, sum, del1,&
+      real(kind=r8) :: sigmap, xxl, xxu, ssign, sum, del1,&
       &del2, dels, t1, t2,&
       &dummy, c1, c2, ss, cs, delu1, delu2, dell1, dell2, deli, cu1,&
       &cu2, cl1, cl2
@@ -675,14 +676,14 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, ierr
-      real(kind=rprec) p, sigma
-      real(kind=rprec), dimension(n) :: x, y, yp
-      real(kind=rprec), dimension(1) :: temp
+      real(kind=r8) p, sigma
+      real(kind=r8), dimension(n) :: x, y, yp
+      real(kind=r8), dimension(1) :: temp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, np1, i, npi, ibak, npibak
-      real(kind=rprec) :: sigmap, delx1, dx1, diag1, sdiag1,&
+      real(kind=r8) :: sigmap, delx1, dx1, diag1, sdiag1,&
       &delx2, dx2, diag2,&
       &sdiag2, diag, ypn
 !-----------------------------------------------
@@ -840,9 +841,9 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, isw, ierr
-      real(kind=rprec) p, s, eps, sigma
-      real(kind=rprec), dimension(n) :: x, y, d, ys, ysp
-      real(kind=rprec), dimension(n, 11) :: temp
+      real(kind=r8) p, s, eps, sigma
+      real(kind=r8), dimension(n) :: x, y, d, ys, ysp
+      real(kind=r8), dimension(n, 11) :: temp
 !-----------------------------------------------
 !
 !
@@ -966,13 +967,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, p, sigma, curvp2
-      real(kind=rprec), dimension(n) :: x, y, yp
+      real(kind=r8) t, p, sigma, curvp2
+      real(kind=r8), dimension(n) :: x, y, yp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec)::tp, sigmap, del1, del2, dels, sum,&
+      real(kind=r8)::tp, sigmap, del1, del2, dels, sum,&
       &sigdel, ss, dummy, s1, s2
 !-----------------------------------------------
 !   E x t e r n a l   F u n c t i o n s
@@ -1065,14 +1066,14 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) xl, xu, p, sigma, curvpi
-      real(kind=rprec), dimension(n) :: x, y, yp
+      real(kind=r8) xl, xu, p, sigma, curvpi
+      real(kind=r8), dimension(n) :: x, y, yp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: uper, isign, ilm1, lper, ium1, ideltp, isave, il, iu, i&
       &, ilp1, np1, iup1, ii, im1
-      real(kind=rprec) :: sigmap, x1pp, xxl, xxu, xsave, xil,&
+      real(kind=r8) :: sigmap, x1pp, xxl, xxu, xsave, xil,&
       &xiu, s1, dels, ss, cs&
       &, s2, del1, del2, t1, t2, dummy, c1, c2, s3, s4, s5, s6, s7, s8&
       &, delu1, delu2, dell1, dell2, deli, cu1, cu2, cl1, cl2, so, si
@@ -1360,13 +1361,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, islpsw, ierr
-      real(kind=rprec) slp1, slpn, sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp, temp, s
+      real(kind=r8) slp1, slpn, sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp, temp, s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, np1, i, im1, ibak
-      real(kind=rprec) :: sigmap, slpp1x, slpp1y, dels1, dels2,&
+      real(kind=r8) :: sigmap, slpp1x, slpp1y, dels1, dels2,&
       &c1, c2, c3, sx, sy,&
       &delt, slppnx, slppny, delsn, delsnm, dx1, dy1, diag1, sdiag1,&
       &dx2, dy2, diag2, sdiag2, diag, diagin
@@ -1568,13 +1569,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, xs, ys, sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp, s
+      real(kind=r8) t, xs, ys, sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp, s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: tn, sigmap, del1, del2, dels,&
+      real(kind=r8) :: tn, sigmap, del1, del2, dels,&
       &sumx, sumy, d, c1, c2,&
       &sigdel, ss, dummy, s1, s2
 !-----------------------------------------------
@@ -1678,13 +1679,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, xs, ys, xst, yst, xstt, ystt, sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp, s
+      real(kind=r8) t, xs, ys, xst, yst, xstt, ystt, sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp, s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: tn, sigmap, del1, del2, dels, sumx,&
+      real(kind=r8) :: tn, sigmap, del1, del2, dels, sumx,&
       &sumy, sumxt, sumyt,&
       &dels6, d, c1, c2, ct1, ct2, ctt1, ctt2, sigdel, ss, dummy, s1,&
       &co1, s2, co2
@@ -1809,15 +1810,15 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, ierr
-      real(kind=rprec) sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp
-      real(kind=rprec), dimension(1) :: temp
-      real(kind=rprec), dimension(n) :: s
+      real(kind=r8) sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp
+      real(kind=r8), dimension(1) :: temp
+      real(kind=r8), dimension(n) :: s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, np1, i, im1, npi, ibak, npibak
-      real(kind=rprec) :: sigmap, dels1, dx1, dy1, diag1,&
+      real(kind=r8) :: sigmap, dels1, dx1, dy1, diag1,&
       &sdiag1, dels2, dx2, dy2,&
       &diag2, sdiag2, diag, diagin, xpn, ypn
 !-----------------------------------------------
@@ -1996,13 +1997,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, xs, ys, sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp, s
+      real(kind=r8) t, xs, ys, sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp, s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: tn, sigmap, si, del1, del2, dels,&
+      real(kind=r8) :: tn, sigmap, si, del1, del2, dels,&
       &sumx, sumy, d, c1, c2,&
       &sigdel, ss, dummy, s1, s2, ci, cim1
 !-----------------------------------------------
@@ -2112,13 +2113,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, xs, ys, xst, yst, xstt, ystt, sigma
-      real(kind=rprec), dimension(n) :: x, y, xp, yp, s
+      real(kind=r8) t, xs, ys, xst, yst, xstt, ystt, sigma
+      real(kind=r8), dimension(n) :: x, y, xp, yp, s
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: im1, i
-      real(kind=rprec) :: tn, sigmap, si, del1, del2, dels, sumx,&
+      real(kind=r8) :: tn, sigmap, si, del1, del2, dels, sumx,&
       &sumy, sumxt, sumyt&
       &, dels6, d, c1, c2, ct1, ct2, ctt1, ctt2, sigdel, ss, dummy, s1&
       &, co1, s2, co2
@@ -2250,20 +2251,20 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer m, n, iz, islpsw, ierr
-      real(kind=rprec) zxy11, zxym1, zxy1n, zxymn, sigma
-      real(kind=rprec), dimension(m) :: x
-      real(kind=rprec), dimension(n) :: y
-      real(kind=rprec), dimension(iz, n) :: z
-      real(kind=rprec), dimension(n) :: zx1, zxm
-      real(kind=rprec), dimension(m) :: zy1, zyn
-      real(kind=rprec), dimension(m, n, 3) :: zp
-      real(kind=rprec), dimension(1) :: temp
+      real(kind=r8) zxy11, zxym1, zxy1n, zxymn, sigma
+      real(kind=r8), dimension(m) :: x
+      real(kind=r8), dimension(n) :: y
+      real(kind=r8), dimension(iz, n) :: z
+      real(kind=r8), dimension(n) :: zx1, zxm
+      real(kind=r8), dimension(m) :: zy1, zyn
+      real(kind=r8), dimension(m, n, 3) :: zp
+      real(kind=r8), dimension(1) :: temp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: mm1, mp1, nm1, np1, npm, i, npi, j, npmpj, jm1, jp1,&
       &jbak, jbakp1, im1, ip1, ibak, ibakp1, npibak
-      real(kind=rprec) :: sigmay, dely1, dely2, c1, c2, c3,&
+      real(kind=r8) :: sigmay, dely1, dely2, c1, c2, c3,&
       &delyn, delynm, sigmax,&
       &delx1, delx2, zxy1ns, delxm, delxmm, zxymns, del1, deli, diag1&
       &, sdiag1, diagi, del2, diag2, sdiag2, diagin, t
@@ -2662,16 +2663,16 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer m, n, iz
-      real(kind=rprec) xx, yy, sigma, surf2
-      real(kind=rprec), dimension(m) :: x
-      real(kind=rprec), dimension(n) :: y
-      real(kind=rprec), dimension(iz, n) :: z
-      real(kind=rprec), dimension(m, n, 3) :: zp
+      real(kind=r8) xx, yy, sigma, surf2
+      real(kind=r8), dimension(m) :: x
+      real(kind=r8), dimension(n) :: y
+      real(kind=r8), dimension(iz, n) :: z
+      real(kind=r8), dimension(m, n, 3) :: zp
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: jm1, j, im1, i
-      real(kind=rprec) :: del1, del2, dels, f1, f2, fp1, fp2,&
+      real(kind=r8) :: del1, del2, dels, f1, f2, fp1, fp2,&
       &sigmap, sinhm1, sinhms&
       &, sinhm2, sigmax, sigmay, zim1, zi, zxxim1, zxxi, dummy
 !-----------------------------------------------
@@ -2738,20 +2739,20 @@ contains
       return
    contains
       function hermz(f1, f2, fp1, fp2)
-         real(kind=rprec) f1, hermz
-         real(kind=rprec) f2
-         real(kind=rprec) fp1
-         real(kind=rprec) fp2
+         real(kind=r8) f1, hermz
+         real(kind=r8) f2
+         real(kind=r8) fp1
+         real(kind=r8) fp2
          hermz = (f2*del1 + f1*del2)/dels - del1*del2*(fp2*(del1 + dels) +&
          &fp1*(del2 + dels))/(6.*dels)
          return
       end function hermz
       function hermnz(f1, f2, fp1, fp2, sigmap)
-         real(kind=rprec) f1, hermnz
-         real(kind=rprec) f2
-         real(kind=rprec) fp1
-         real(kind=rprec) fp2
-         real(kind=rprec) sigmap
+         real(kind=r8) f1, hermnz
+         real(kind=r8) f2
+         real(kind=r8) fp1
+         real(kind=r8) fp2
+         real(kind=r8) sigmap
          hermnz = (f2*del1 + f1*del2)/dels + (fp2*del1*(sinhm1 - sinhms) +&
          &fp1*del2*(sinhm2 - sinhms))/(sigmap*sigmap*dels*(1.+sinhms))
          return
@@ -2763,11 +2764,11 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) del1, del2, sigma, c1, c2, c3
+      real(kind=r8) del1, del2, sigma, c1, c2, c3
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-      real(kind=rprec)::del, dummy, coshm1, coshm2, delp, delm,&
+      real(kind=r8)::del, dummy, coshm1, coshm2, delp, delm,&
       &sinhmp, sinhmm, denom
 !-----------------------------------------------
 !
@@ -2853,15 +2854,15 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, isw, ierr
-      real(kind=rprec) p, s, eps, sigma
-      real(kind=rprec), dimension(n) :: x, y, d, ys, ysp, td,&
+      real(kind=r8) p, s, eps, sigma
+      real(kind=r8), dimension(n) :: x, y, d, ys, ysp, td,&
       &tsd1, hd, hsd1, hsd2,&
       &rd, rsd1, rsd2, rnm1, rn, v
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, nm2, nm3, i, ip1, im1, ibak
-      real(kind=rprec) :: q, sigmap, delxi1, delyi1, dim1, delxi,&
+      real(kind=r8) :: q, sigmap, delxi1, delyi1, dim1, delxi,&
       &delyi, di, hsd11,&
       &sl, su, betapp, betap, alphap, sumd, sumy, disq, alpha, hsd1ip&
       &, beta, con, sum, hsd1p, hdim1, hdi, yspnm1, yspn, rsd1i,&
@@ -3342,15 +3343,15 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n, isw, ierr
-      real(kind=rprec) s, eps, sigma
-      real(kind=rprec), dimension(n) :: x, y, d, ys, ysp,&
+      real(kind=r8) s, eps, sigma
+      real(kind=r8), dimension(n) :: x, y, d, ys, ysp,&
       &td, tsd1, hd, hsd1, hsd2,&
       &rd, rsd1, rsd2, v
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: nm1, nm3, i, ibak
-      real(kind=rprec) :: p, rdim1, yspim2, sigmap, delxi1,&
+      real(kind=r8) :: p, rdim1, yspim2, sigmap, delxi1,&
       &delyi1, dim1, delxi,&
       &delyi, di, sl, su, betapp, betap, alphap, alpha, beta, hsd1p,&
       &hdim1, hdi, rsd2i, rsd1i, sum, f, g, wim2, wim1, tui, wi, h,&
@@ -3667,13 +3668,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t
-      real(kind=rprec), dimension(n) :: x
+      real(kind=r8) t
+      real(kind=r8), dimension(n) :: x
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: i, il, ih
-      real(kind=rprec) :: tt
+      real(kind=r8) :: tt
 
       save i
 !-----------------------------------------------
@@ -3762,13 +3763,13 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer n
-      real(kind=rprec) t, p, tp
-      real(kind=rprec), dimension(n) :: x
+      real(kind=r8) t, p, tp
+      real(kind=r8), dimension(n) :: x
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
       integer :: i, nper, il, ih
-      real(kind=rprec) :: tt
+      real(kind=r8) :: tt
 
       save i
 !-----------------------------------------------
@@ -3866,11 +3867,11 @@ contains
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
       integer isw
-      real(kind=rprec) sinhm, coshm, x
+      real(kind=r8) sinhm, coshm, x
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-      real(kind=rprec) :: sp14, sp13, sp12, sp11, sq12, sq11,&
+      real(kind=r8) :: sp14, sp13, sp12, sp11, sq12, sq11,&
       &sq10, sp25, sp24, sp23&
       &, sp22, sp21, sq22, sq21, sq20, sp35, sp34, sp33, sp32, sp31,&
       &sq32, sq31, sq30, sp45, sp44, sp43, sp42, sp41, sq42, sq41,&
@@ -4051,11 +4052,11 @@ contains
 !-----------------------------------------------
 !   D u m m y   A r g u m e n t s
 !-----------------------------------------------
-      real(kind=rprec) diag, sdiag, sigma, del
+      real(kind=r8) diag, sdiag, sigma, del
 !-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-      real(kind=rprec) :: sigdel, sinhm, coshm, denom
+      real(kind=r8) :: sigdel, sinhm, coshm, denom
 !-----------------------------------------------
 !
 !

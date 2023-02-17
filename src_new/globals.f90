@@ -10,7 +10,7 @@ module globals
    !     developed beyond the call. Initial tests have not indicated it
    !     speeds things up.
    logical, parameter :: subset_eq = .false.
-   
+
    logical, parameter :: ipos_def_sym = .false.
    logical :: lrfp ! If true: use reversed field pinch settings
    logical :: cyl  ! If true: cylindrical geometry???
@@ -19,7 +19,7 @@ module globals
    integer :: irads, ir_fine_scl
 
    !  read_fourier_dat
-   integer :: ith, izt, mpol, ntor, mnmx, ntors, nfp, mode_family
+   integer :: ith, izt, mpol, ntor, mnmx, ntors, nfp
    integer, allocatable, dimension(:) :: nw, mwl, mwu
 
    !  read_plasma_dat
@@ -30,7 +30,12 @@ module globals
    real(r8) :: bfavg
    real(r8) :: scale_khz
 
-   real(r8), allocatable, dimension(:) :: rho, rho_fine, zetas, thetas
+   !  Global variables
+
+   integer :: mn_col
+   integer, allocatable, dimension(:) :: im_col, in_col
+
+   real(r8), allocatable, dimension(:) :: rho, rho_fine, rn, rm, rn_col, rm_col
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:) :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
 

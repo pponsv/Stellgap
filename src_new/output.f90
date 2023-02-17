@@ -5,9 +5,10 @@ module output
 
 contains
 
-   subroutine write_modes(mnmx, mn_col, rm, rn, im_col, in_col)
-      integer, intent(in) :: mnmx, mn_col, im_col(:), in_col(:)
-      real(r8) :: rm(:), rn(:)
+   subroutine write_modes
+      use globals, only: rm, rn, mnmx, mn_col, im_col, in_col
+      ! integer, intent(in) :: mnmx, mn_col, im_col(:), in_col(:)
+      ! real(r8) :: rm(:), rn(:)
       integer :: i
 
       open (unit=22, file="modes", status="unknown")

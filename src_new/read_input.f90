@@ -99,8 +99,8 @@ contains
 
 
    subroutine read_fourier_dat
-      use globals, only: nfp, ith, izt, mode_family, ntors, nw, mwl, mwu, mpol, ntor, mnmx
-      integer :: i, istat
+      use globals, only: nfp, ith, izt, ntors, nw, mwl, mwu, mpol, ntor, mnmx
+      integer :: i, istat, mode_family
 
       open (unit=20, file="fourier.dat", status="old")
       read (20, *) nfp, ith, izt, mode_family

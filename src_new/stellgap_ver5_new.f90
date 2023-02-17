@@ -2,14 +2,14 @@ program tae_continua
 
    !  Serial version
 
+   use kind_spec
+   use globals
    use fourier_lib
    use fourier_lib_convolve
-   use kind_spec
    use postprocess
    use fitpack
    use input
    use output
-   use globals
    use helper
 
    implicit none
