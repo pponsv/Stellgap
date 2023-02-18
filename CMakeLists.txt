@@ -61,7 +61,7 @@ set_source_files_properties(
 )
 set(MODULES_SRC "src_new/kind_spec.f90" "src_new/fourier_lib.f90" "src_new/fourier_lib_convolve.f90" 
       "src_new/post_process.f90" "src_new/fitpack.f90" "src_new/read_input.f90" "src_new/output.f90" 
-      "src_new/globals.f90" "src_new/helper.f90")
+      "src_new/globals.f90" "src_new/helper.f90" "src_new/eig_solver.f90" )
 add_executable(xstgap_new ${XSTGAP_NEW_SRC} ${MODULES_SRC})
     target_link_libraries(xstgap_new lapack blas m pthread)
     target_compile_definitions(xstgap_new PRIVATE -D${SERIAL})

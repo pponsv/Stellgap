@@ -92,7 +92,7 @@ contains
       end do
    end function real_linspace
 
-   
+
    function real_linspace_nolast(xi, xf, np) result(out)
       !       Makes a linearly spaced vector between xi, xf
       !       (xf excluded) with np elements

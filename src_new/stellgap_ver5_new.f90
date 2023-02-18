@@ -11,11 +11,12 @@ program tae_continua
    use input
    use output
    use helper
+   use eig_solver
 
    implicit none
 
 
-   external dggev, dsygv, dsygvx ! LAPACK subroutines
+
 
    !!!!!!!  PRUEBAS
 
@@ -23,36 +24,30 @@ program tae_continua
 
    !!!!!!!  END PRUEBAS
 
-   integer, parameter :: iopt = 1
+
 
    !  Dummy integers for loops
 
-   integer :: ir, irr, il, iu, lg, istat, i, j, mn
-   integer :: ispl_opt, ierr_spl
+   integer :: ir, lg, istat, i, j, mn
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index
-   integer :: m_emax, n_emax, isym_opt
-   integer :: ldvl, ldvr, lwork, info, m_red
-   integer, allocatable, dimension(:) :: ifail, iwork
+   integer :: m_emax, n_emax
 
-   real(r8) :: sp1, sp2, sigma_spl
-   real(r8) :: eig_max, ccci, scsi, egl, egu, abstol, f1_avg, f3_avg
+
+   real(r8) :: eig_max, ccci, scsi, f1_avg, f3_avg
 
    real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
-   real(r8), allocatable, dimension(:) :: beta, eig_vect, omega, work, alfr, alfi
-   real(r8), allocatable, dimension(:) :: ypi, tempi
 
    real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
-   real(r8), allocatable, dimension(:,:) :: amat, bmat, vr, vl
 
-   complex*16, allocatable :: alpha(:)
+   real(r8), allocatable, dimension(:) :: eig_vect
 
-   character*1 jobz
 
    !  START PROGRAM
 
-   cyl = .false.
-   lrfp = .false.
+   ! cyl = .false.
+   ! lrfp = .false.
+   ! jobz = 'V'
 
    !  Read command-line arguments
    call read_args
@@ -63,44 +58,30 @@ program tae_continua
    !  Read fourier.dat
    call read_fourier_dat
 
-   allocate (ion_density(ir_fine_scl),iota_r(ir_fine_scl), &
-      iota_r_inv(ir_fine_scl), stat = istat)
+   allocate (ion_density(ir_fine_scl), stat = istat)
+   allocate (iota_r(ir_fine_scl), stat = istat)
+   allocate (iota_r_inv(ir_fine_scl), stat = istat)
    allocate (iotac(irads), stat = istat)
-   ! allocate (yp(3*irads), stat = istat)
-   allocate (ypi(3*irads), stat = istat)
-   allocate (tempi(3*irads), stat = istat)
-
-   jobz = 'V'
-
-   if (ipos_def_sym) isym_opt = 1
-   if (.NOT. ipos_def_sym) isym_opt = 0
 
    !    Generate Fourier arrays - TODO CHANGE
    call trig_array
 
    call convolution_array
 
-   ! naux = 10 * mn_col
-   scale_khz = (1.d+3 * 2 * PI)**2
-
-   ldvl = mn_col
-   ldvr = mn_col
-   lwork = 20 * mn_col
-
-   ! allocate (aux(naux), stat = istat)
-   allocate (alpha(mn_col), stat = istat)
-   allocate (beta(mn_col), stat = istat)
    allocate (eig_vect(mn_col), stat = istat)
-   allocate (omega(mn_col), stat = istat)
-   allocate (amat(mn_col, mn_col), stat = istat)
-   allocate (bmat(mn_col, mn_col), stat = istat)
-   allocate (ifail(mn_col), stat = istat)
-   allocate (work(lwork), stat = istat)
-   allocate (iwork(lwork), stat = istat)
-   allocate (alfr(mn_col), stat = istat)
-   allocate (alfi(mn_col), stat = istat)
-   allocate (vl(mn_col, mn_col), stat = istat)
-   allocate (vr(mn_col, mn_col), stat = istat)
+
+   ! allocate (alpha(mn_col), stat = istat)
+   ! allocate (beta(mn_col), stat = istat)
+   ! allocate (omega(mn_col), stat = istat)
+   ! allocate (amat(mn_col, mn_col), stat = istat)
+   ! allocate (bmat(mn_col, mn_col), stat = istat)
+   ! allocate (work(lwork), stat = istat)
+   ! allocate (ifail(mn_col), stat = istat)
+   ! allocate (iwork(lwork), stat = istat)
+   ! allocate (alfr(mn_col), stat = istat)
+   ! allocate (alfi(mn_col), stat = istat)
+   ! allocate (vl(mn_col, mn_col), stat = istat)
+   ! allocate (vr(mn_col, mn_col), stat = istat)
 
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
@@ -117,41 +98,43 @@ program tae_continua
 
    write (*, *) izt, ith, irads, mnmx, ith*izt, mn_col
 
-   
+
    !    Boozer coordinates input - new ae-mode-structure input
    call read_tae_data_boozer
-   
+
    !    Record equilibrium and eigenfunction Fourier mode list
    call write_modes
-   
+
    !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
    !
    iota_r = interp_wrap_rename(rho, iotac, rho_fine)
    iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
-   
+
    select case (ion_profile)
-   case (0)
+    case (0)
       ion_density = (iota_r / iotac(1))**2
-   case (1)
+    case (1)
       ion_density = poly_eval(rho_fine, nion)
-   case (2)
+    case (2)
       ion_density = 1._r8
-   case (3)
+    case (3)
       ion_density = (1. - aion * (rho_fine**bion))**cion
    end select
-   
+
    mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
-   
+
    call write_ion_profile
-   
+
    !  Interpolate field, jacobian and gss
    bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
    rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
-   
+
    open (unit = 21, file = "alfven_spec", status = "unknown")
    open (unit = 8, file = "coef_arrays", status = "unknown")
+
+   call initialize_solver
 
    !  Main loop
    do ir = (1), (ir_fine_scl)
@@ -159,7 +142,9 @@ program tae_continua
       !      do ir=1,ir_fine_scl
       ! r_pt = rho(1) + real(ir - 1) * (rho(irads) - rho(1))&
       ! & / real(ir_fine_scl - 1)
+
       print *, ir, rho_fine(ir)
+
       f1_avg = 0.; f3_avg = 0.
       do i = 1, izt
          do j = 1, ith
@@ -278,34 +263,29 @@ program tae_continua
       !     Call matrix eigenvalue solver
       !
 
-      egl = 1.d-2; egu = 0.6d0; abstol = 1.d-8
-      il = 0; iu = 0
+      ! egl = 1.d-2; egu = 0.6d0; abstol = 1.d-8
+      ! il = 0; iu = 0
 
-      if (.not. ipos_def_sym) then
-         call dggev('N', 'V', mn_col, amat, mn_col, bmat, mn_col, alfr, alfi, &
-         &beta, vl, ldvl, vr, ldvr, work, lwork, info)
-      else if (ipos_def_sym .and. .not. subset_eq) then
-         call dsygv(iopt, jobz, 'L', mn_col, amat, mn_col, bmat, mn_col, &
-         &omega, work, lwork, info)
-         if (info .ne. 0) write (*, '("info = ",i8)') info
+      ! if (.not. ipos_def_sym) then
+      !    call dggev('N', 'V', mn_col, amat, mn_col, bmat, mn_col, alfr, alfi, beta, vl, ldvl, vr, ldvr, work, lwork, info)
+      ! else if (ipos_def_sym .and. .not. subset_eq) then
+      !    call dsygv(iopt, jobz, 'L', mn_col, amat, mn_col, bmat, mn_col, omega, work, lwork, info)
+      ! else if (ipos_def_sym .and. subset_eq) then
+      !    call dsygvx(iopt, 'V', 'V', 'L', mn_col, amat, mn_col, bmat, mn_col, egl, egu, il, iu, abstol, m_red, omega, vr, &
+      !       mn_col, work, lwork, iwork, ifail, info)
+      ! end if
+      ! if (info .ne. 0) write (*, '("info = ",i8)') info
+      ! !
 
-      else if (ipos_def_sym .and. subset_eq) then
-         call dsygvx(iopt, 'V', 'V', 'L', mn_col, amat, mn_col, bmat, mn_col, &
-         &egl, egu, il, iu, abstol, m_red, omega, vr, mn_col, &
-         &work, lwork, iwork, ifail, info)
-         if (info .ne. 0) write (*, '("info = ",i8)') info
+      call eigenvalue_solver
 
-      end if
-      !
       do i = 1, mn_col
          if (iopt .eq. 1) then
             do j = 1, mn_col
-               if (ipos_def_sym .and. jobz .eq. 'V' .and. .not. subset_eq)&
-               &eig_vect(j) = abs(amat(j, i))
+               if (ipos_def_sym .and. jobz .eq. 'V' .and. .not. subset_eq) then
+                  eig_vect(j) = abs(amat(j, i))
+               end if
                if (.not. ipos_def_sym) eig_vect(j) = abs(vr(j, i))
-               !        if(ir .eq. 5 .and. i .eq. mn_col/2)
-               !     >   write(*,'(e15.7,2x,i4,2x,i4)') eig_vect(j),
-               !     >   im_col(j), in_col(j)
             end do
 
             eig_max = -1.d+30
@@ -323,18 +303,15 @@ program tae_continua
             !     >    j_max_index
 
             if (ipos_def_sym) then
-               write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), &
-               &m_emax, n_emax
+               write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), m_emax, n_emax
             else if (.NOT. ipos_def_sym) then
-               write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), &
-               &alfi(i), beta(i), m_emax, n_emax
+               write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), alfi(i), beta(i), m_emax, n_emax
             end if
          else if (iopt .eq. 0) then
             if (ipos_def_sym) then
                write (21, '(e15.7,2x,e15.7)') rho_fine(ir), sqrt(abs(omega(i)))
             else if (.NOT. ipos_def_sym) then
-               write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), &
-               &alfi(i), beta(i)
+               write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), alfi(i), beta(i)
             end if
          end if
       end do          !do i=1,mn_col
@@ -350,9 +327,9 @@ program tae_continua
 
    call trg_deallocate
    ! deallocate (alpha, beta, aux)
-   deallocate (alpha, beta)
+   ! deallocate (alpha, beta)
 
-   call write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
+   call write_data_post
 
    call post_process
 

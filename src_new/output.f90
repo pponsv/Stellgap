@@ -47,9 +47,12 @@ contains
 
    end subroutine write_ion_profile
 
-   subroutine write_data_post(iopt, mn_col, ir_fine_scl, isym_opt)
-      ! use globals, only: iopt, mn_col, ir_fine_scl, isym_opt
-      integer, intent(in) :: iopt, mn_col, ir_fine_scl, isym_opt
+   subroutine write_data_post
+      use globals, only: iopt, mn_col, ir_fine_scl, ipos_def_sym
+      integer :: isym_opt
+
+      if (ipos_def_sym) isym_opt = 1
+      if (.NOT. ipos_def_sym) isym_opt = 0
 
       open (unit = 7, file = "data_post", status = "unknown")
       write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt

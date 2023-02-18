@@ -5,15 +5,16 @@ module globals
 
    implicit none
 
-   !    The subset_eq flag allows one to just request a bracketed subset of
-   !     eigenvalues, rather than all eigenvalues. This option has not been
-   !     developed beyond the call. Initial tests have not indicated it
-   !     speeds things up.
-   logical, parameter :: subset_eq = .false.
+   !  PARAMETERS
+   
+   character(len=1), parameter :: jobz = 'V'
+   logical, parameter :: subset_eq = .false.    !  Request a bracketed subset of eigenvalues. Not implemented?
+   logical, parameter :: ipos_def_sym = .false. !  TODO???
+   logical, parameter :: lrfp = .false.         ! If true: use reversed field pinch settings
+   logical, parameter :: cyl = .false.          ! If true: cylindrical geometry???
+   integer, parameter :: iopt = 1               !  Specifies problem to be solved by dggev, dsygv, dsygvx
+   real(r8), parameter :: scale_khz = (1.d+3 * 2 * PI)**2
 
-   logical, parameter :: ipos_def_sym = .false.
-   logical :: lrfp ! If true: use reversed field pinch settings
-   logical :: cyl  ! If true: cylindrical geometry???
 
    !  Command line input
    integer :: irads, ir_fine_scl
@@ -28,7 +29,6 @@ module globals
 
    !  read_tae_data_boozer
    real(r8) :: bfavg
-   real(r8) :: scale_khz
 
    !  Global variables
 
