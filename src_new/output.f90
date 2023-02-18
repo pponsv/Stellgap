@@ -27,6 +27,7 @@ contains
 
    end subroutine write_modes
 
+
    subroutine write_ion_profile
       use globals, only: bfavg, scale_khz, mu0_rho_ion, ir_fine_scl, ion_density_0, ion_density, &
          iota_r, rho_fine
@@ -46,6 +47,7 @@ contains
 
    end subroutine write_ion_profile
 
+
    subroutine write_data_post
       use globals, only: iopt, mn_col, ir_fine_scl, ipos_def_sym
       integer :: isym_opt
@@ -58,6 +60,7 @@ contains
       close (unit = 7)
 
    end subroutine write_data_post
+
 
    subroutine write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
       use globals, only: mnmx, rm, rn
@@ -72,5 +75,28 @@ contains
       close (unit = 8)
 
    end subroutine write_coef_arrays
+
+
+   ! subroutine write_alfven_post(ipos_def_sym, iopt)
+   !    use globals, only: rho_fine
+   !    use fourier_lib, only: omega
+   !    integer, intent(in) :: iopt
+   !    logical, intent(in) :: ipos_def_sym
+
+   !    if (iopt .eq. 1) then
+   !       if (ipos_def_sym) then
+   !          write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), m_emax, n_emax
+   !       else if (.NOT. ipos_def_sym) then
+   !          write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), alfi(i), beta(i), m_emax, n_emax
+   !       end if
+   !    else if (iopt .eq. 0) then
+   !       if (ipos_def_sym) then
+   !          write (21, '(e15.7,2x,e15.7)') rho_fine(ir), sqrt(abs(omega(i)))
+   !       else if (.NOT. ipos_def_sym) then
+   !          write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), alfi(i), beta(i)
+   !       end if
+   !    end if
+
+   ! end subroutine write_alfven_post
 
 end module output

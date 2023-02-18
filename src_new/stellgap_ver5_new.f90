@@ -125,9 +125,10 @@ program tae_continua
    !  Main loop
    do ir = (1), (ir_fine_scl)
 
-      if (modulo(ir, ir_fine_scl/10) .eq. 0) print *, 100*ir/ir_fine_scl, '%, ', rho_fine(ir)
+      !  Print percentage completed
+      if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i3,"%")', advance="no") 100*ir/ir_fine_scl
 
-      ! f1_avg = 0.; f3_avg = 0.
+      ! Make arrays to be expanded (eqs. 6, 8 of the paper)
       f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
       f1_avg = sum(f1) / real(izt*ith)
       if (.not. lrfp) then
@@ -161,13 +162,7 @@ program tae_continua
       !     Write out coefficient spectra if half way out in flux
       !
       if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
-         ! open (unit = 8, file = "coef_arrays", status = "unknown")
-         ! do mn = 1, mnmx
-         !    write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') rm(mn), rn(mn), &
-         !       f1_nm(mn), f3a_nm(mn), f3b_nm(mn), f3c_nm(mn)
-         ! end do
-         ! close (unit = 8)
-      ! end if
+
       !
       !     Build A and B matrices
       !

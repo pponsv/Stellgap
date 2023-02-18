@@ -37,9 +37,9 @@ contains
       allocate (vl(mn_col, mn_col), stat = istat)
       allocate (vr(mn_col, mn_col), stat = istat)
       allocate (beta(mn_col), stat = istat)
- 
 
    end subroutine initialize_solver
+
 
    subroutine eigenvalue_solver
       ! real(r8) :: beta
