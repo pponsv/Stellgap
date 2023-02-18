@@ -2,40 +2,59 @@ module fourier_lib_convolve
 
    use kind_spec, only: r8
    use fourier_lib
-   use fitpack
-   use globals
+   ! use fitpack
+   ! use globals
 
    implicit none
 
 contains
-   subroutine toFourier
-!
-!   Do Fourier transform integrations needed to convert data on a
-!   theta, zeta grid [stored in array f(i=1,nznt)] to a set
-!   of Fourier amplitudes [stored in array fnm(mn=1,mnmx)].
-!   Typically, the number of grid points in each direction needs
-!   to be > 3*number of modes used in each direction to avoid
-!   aliasing errors(implies nznt > 9*mnmx).
-!
-!      do mn=1,mnmx     !loop over Fourier modes
-!       fnm(mn) = 0.
-!      do i=1,nznt      !loop over theta,zeta grid
-!       if(sin_type .eq. 1 .and. cos_type .eq. 0) then
-!         fnm(mn) = fnm(mn) + f(i)*sin_toF(i,mn)
-!       else if(sin_type .eq. 0 .and. cos_type .eq. 1) then
-!         fnm(mn) = fnm(mn) + f(i)*cos_toF(i,mn)
-!       endif
-!      end do
-!      end do
-!
-      if (sin_type .eq. 1 .and. cos_type .eq. 0) then
-         fnm = matmul(f, sin_toF)
-      else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
-         fnm = matmul(f, cos_toF)
-      end if
-!
-      return
-   end subroutine toFourier
+
+   function toFourier_new(fin, trigtype) result(fout)
+      use fourier_lib, only: cos_toF, sin_toF
+
+      real(r8), intent(in) :: fin(:,:)
+      character*1, intent(in) :: trigtype
+      real(r8), allocatable, dimension(:) :: fout, ftemp
+
+      ftemp = reshape(transpose(fin), [size(fin)])
+      select case (trigtype)
+       case('c')
+         fout = matmul(ftemp, cos_toF)
+       case('s')
+         fout = matmul(ftemp, sin_toF)
+      end select
+
+   end function toFourier_new
+
+
+!    subroutine toFourier
+! !
+! !   Do Fourier transform integrations needed to convert data on a
+! !   theta, zeta grid [stored in array f(i=1,nznt)] to a set
+! !   of Fourier amplitudes [stored in array fnm(mn=1,mnmx)].
+! !   Typically, the number of grid points in each direction needs
+! !   to be > 3*number of modes used in each direction to avoid
+! !   aliasing errors(implies nznt > 9*mnmx).
+! !
+! !      do mn=1,mnmx     !loop over Fourier modes
+! !       fnm(mn) = 0.
+! !      do i=1,nznt      !loop over theta,zeta grid
+! !       if(sin_type .eq. 1 .and. cos_type .eq. 0) then
+! !         fnm(mn) = fnm(mn) + f(i)*sin_toF(i,mn)
+! !       else if(sin_type .eq. 0 .and. cos_type .eq. 1) then
+! !         fnm(mn) = fnm(mn) + f(i)*cos_toF(i,mn)
+! !       endif
+! !      end do
+! !      end do
+! !
+!       if (sin_type .eq. 1 .and. cos_type .eq. 0) then
+!          fnm = matmul(f, sin_toF)
+!       else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
+!          fnm = matmul(f, cos_toF)
+!       end if
+! !
+!       return
+!    end subroutine toFourier
 !
 !    subroutine old_toFourier
 
@@ -67,29 +86,30 @@ contains
 !       return
 !    end subroutine old_toFourier
 !
-   subroutine toReal
-!
-!    Convert Fourier mode representation [stored in array anm(mn=1,mnmx)]
-!    to values of function on a regularly spaced 2D grid
-!    [stored in array f(i=1,nznt)].
-!
-      integer :: i, mn
+!    subroutine toReal
+! !
+! !    Convert Fourier mode representation [stored in array anm(mn=1,mnmx)]
+! !    to values of function on a regularly spaced 2D grid
+! !    [stored in array f(i=1,nznt)].
+! !
+!       integer :: i, mn
 
-      do i = 1, ith*izt
-         f(i) = 0.
-         do mn = 1, mnmx
-            if (sin_type .eq. 1 .and. cos_type .eq. 0) then
-               f(i) = f(i) + anm(mn)*sin_ar(i, mn)
-            else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
-               f(i) = f(i) + anm(mn)*cos_ar(i, mn)
-            end if
-         end do
-      end do
-   end subroutine toReal
+!       do i = 1, ith*izt
+!          f(i) = 0.
+!          do mn = 1, mnmx
+!             if (sin_type .eq. 1 .and. cos_type .eq. 0) then
+!                f(i) = f(i) + anm(mn)*sin_ar(i, mn)
+!             else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
+!                f(i) = f(i) + anm(mn)*cos_ar(i, mn)
+!             end if
+!          end do
+!       end do
+!    end subroutine toReal
 !
 !
 !
    subroutine dbydth
+      use globals, only: mnmx, rm
 !
 !    Take the theta derivative of the input Fourier amplitude array, fnm
 !    and place the result in the output Fourier amplitude array, anm.
@@ -115,12 +135,13 @@ contains
 !
 !
    subroutine dbydzt
+      use globals, only: mnmx, rn
 !
 !    Take the zeta derivative of the input Fourier amplitude array, fnm
 !    and place the result in the output Fourier amplitude array, anm.
 !    Changes to the sin/cos parity are reflected through the sin_type and
 !    cos_type variables.
-! 
+!
       integer :: i
       do i = 1, mnmx
          if (sin_type .eq. 1 .and. cos_type .eq. 0) then

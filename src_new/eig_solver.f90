@@ -9,13 +9,12 @@ module eig_solver
 
    public :: initialize_solver, eigenvalue_solver
    public :: amat, bmat, alfr, vr, alfi, omega, beta
-   ! public :: dggev, dsygv, dsygvx
 
    external :: dggev, dsygv, dsygvx ! LAPACK subroutines
 
    integer :: lwork, m_red
+
    integer, allocatable, dimension(:)    :: ifail, iwork
-   
    real(r8), allocatable, dimension(:,:) :: amat, bmat, vr, vl
    real(r8), allocatable, dimension(:)   :: alfr, alfi, work, omega, beta
 

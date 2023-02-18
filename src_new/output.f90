@@ -7,8 +7,7 @@ contains
 
    subroutine write_modes
       use globals, only: rm, rn, mnmx, mn_col, im_col, in_col
-      ! integer, intent(in) :: mnmx, mn_col, im_col(:), in_col(:)
-      ! real(r8) :: rm(:), rn(:)
+
       integer :: i
 
       open (unit=22, file="modes", status="unknown")
@@ -59,5 +58,19 @@ contains
       close (unit = 7)
 
    end subroutine write_data_post
+
+   subroutine write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
+      use globals, only: mnmx, rm, rn
+      real(r8), intent(in), dimension(mnmx) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
+      integer :: mn
+
+      open (unit = 8, file = "coef_arrays", status = "unknown")
+      do mn = 1, mnmx
+         write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') rm(mn), rn(mn), &
+            f1_nm(mn), f3a_nm(mn), f3b_nm(mn), f3c_nm(mn)
+      end do
+      close (unit = 8)
+
+   end subroutine write_coef_arrays
 
 end module output

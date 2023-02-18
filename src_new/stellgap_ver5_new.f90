@@ -20,27 +20,23 @@ program tae_continua
 
    !!!!!!!  PRUEBAS
 
-   real(r8), allocatable :: tmp(:)
+   real(r8), allocatable :: tmp(:), f2(:,:)
+   real(r8) :: f2_avg
 
    !!!!!!!  END PRUEBAS
 
-
-
    !  Dummy integers for loops
 
-   integer :: ir, lg, istat, i, j, mn
+   integer :: ir, istat, i, j, mn
    integer :: ni, nj, mi, mj, ieq, meq, neq
-   integer :: j_max_index
-   integer :: m_emax, n_emax
+   integer :: j_max_index, m_emax, n_emax
 
 
    real(r8) :: eig_max, ccci, scsi, f1_avg, f3_avg
 
    real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
-
-   real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
-
    real(r8), allocatable, dimension(:) :: eig_vect
+   real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
 
 
    !  START PROGRAM
@@ -70,19 +66,6 @@ program tae_continua
 
    allocate (eig_vect(mn_col), stat = istat)
 
-   ! allocate (alpha(mn_col), stat = istat)
-   ! allocate (beta(mn_col), stat = istat)
-   ! allocate (omega(mn_col), stat = istat)
-   ! allocate (amat(mn_col, mn_col), stat = istat)
-   ! allocate (bmat(mn_col, mn_col), stat = istat)
-   ! allocate (work(lwork), stat = istat)
-   ! allocate (ifail(mn_col), stat = istat)
-   ! allocate (iwork(lwork), stat = istat)
-   ! allocate (alfr(mn_col), stat = istat)
-   ! allocate (alfi(mn_col), stat = istat)
-   ! allocate (vl(mn_col, mn_col), stat = istat)
-   ! allocate (vr(mn_col, mn_col), stat = istat)
-
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
    allocate (f3b_nm(mnmx), stat = istat)
@@ -91,6 +74,10 @@ program tae_continua
    allocate (f3a(izt, ith), stat = istat)
    allocate (f3b(izt, ith), stat = istat)
    allocate (f3c(izt, ith), stat = istat)
+
+
+   allocate (f2(izt, ith), stat = istat)
+
    !
    !   Open files for output
    !
@@ -132,40 +119,28 @@ program tae_continua
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
    open (unit = 21, file = "alfven_spec", status = "unknown")
-   open (unit = 8, file = "coef_arrays", status = "unknown")
 
    call initialize_solver
 
    !  Main loop
    do ir = (1), (ir_fine_scl)
-      !       write(*,*) ir
-      !      do ir=1,ir_fine_scl
-      ! r_pt = rho(1) + real(ir - 1) * (rho(irads) - rho(1))&
-      ! & / real(ir_fine_scl - 1)
 
-      print *, ir, rho_fine(ir)
+      if (modulo(ir, ir_fine_scl/10) .eq. 0) print *, 100*ir/ir_fine_scl, '%, ', rho_fine(ir)
 
-      f1_avg = 0.; f3_avg = 0.
-      do i = 1, izt
-         do j = 1, ith
-            f1(i, j) = gsssup_lrg(i, j, ir) * rjacob_lrg(i, j, ir) / &
-               (bfield_lrg(i, j, ir)**2)
-            f1_avg = f1_avg + f1(i, j) / real(izt * ith)
-            if (.not. lrfp) then
-               f3c(i, j) = gsssup_lrg(i, j, ir) / &
-                  (rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
-               f3_avg = f3_avg + f3c(i, j) / real(izt * ith)
-               f3b(i, j) = iota_r(ir) * f3c(i, j)
-               f3a(i, j) = iota_r(ir) * f3b(i, j)
-            else if (lrfp) then
-               f3a(i, j) = gsssup_lrg(i, j, ir) / &
-                  (rjacob_lrg(i, j, ir) * (bfield_lrg(i, j, ir)**2))
-               f3b(i, j) = f3a(i, j) * iota_r_inv(ir)
-               f3c(i, j) = f3b(i, j) * iota_r_inv(ir)
-               f3_avg = f3_avg + f3a(i, j) / real(izt * ith)
-            end if
-         end do
-      end do
+      ! f1_avg = 0.; f3_avg = 0.
+      f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
+      f1_avg = sum(f1) / real(izt*ith)
+      if (.not. lrfp) then
+         f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         f3b = iota_r(ir) * f3c
+         f3a = iota_r(ir) * f3b
+         f3_avg = sum(f3c) / real(izt * ith)
+      else if (lrfp) then
+         f3a = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         f3b = iota_r_inv(ir) * f3a
+         f3c = iota_r_inv(ir) * f3b
+         f3_avg = sum(f3a) / real(izt * ith)
+      end if
 
       !  Inútil?
       if (cyl) then
@@ -175,64 +150,24 @@ program tae_continua
             f1 = f1_avg
          end if
       end if
-      !
-      !
+
       !     Generate Fourier spectra of above gridded coefficients
       !
-      lg = 0
-      do i = 1, izt
-         do j = 1, ith
-            lg = lg + 1
-            f(lg) = f1(i, j)
-         end do
-      end do
-      sin_type = 0; cos_type = 1
-      call toFourier
-      f1_nm(:) = fnm(:)
-      !
-      lg = 0
-      do i = 1, izt
-         do j = 1, ith
-            lg = lg + 1
-            f(lg) = f3a(i, j)
-         end do
-      end do
-      sin_type = 0; cos_type = 1
-      call toFourier
-      f3a_nm(:) = fnm(:)
-      !
-      lg = 0
-      do i = 1, izt
-         do j = 1, ith
-            lg = lg + 1
-            f(lg) = f3b(i, j)
-         end do
-      end do
-      sin_type = 0; cos_type = 1
-      call toFourier
-      f3b_nm(:) = fnm(:)
-      !
-      lg = 0
-      do i = 1, izt
-         do j = 1, ith
-            lg = lg + 1
-            f(lg) = f3c(i, j)
-         end do
-      end do
-      sin_type = 0; cos_type = 1
-      call toFourier
-      f3c_nm(:) = fnm(:)
-      !
-      !
+      f1_nm  = toFourier_new(f1, trigtype='c') !  Si le quitas el transpose desaparecen los gaps??
+      f3a_nm = toFourier_new(f3a, trigtype='c')
+      f3b_nm = toFourier_new(f3b, trigtype='c')
+      f3c_nm = toFourier_new(f3c, trigtype='c')
+
       !     Write out coefficient spectra if half way out in flux
       !
-      if (ir .eq. ir_fine_scl / 2) then
-         do mn = 1, mnmx
-            write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') rm(mn), rn(mn), &
-            &f1_nm(mn), f3a_nm(mn), &
-            &f3b_nm(mn), f3c_nm(mn)
-         end do
-      end if
+      if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
+         ! open (unit = 8, file = "coef_arrays", status = "unknown")
+         ! do mn = 1, mnmx
+         !    write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') rm(mn), rn(mn), &
+         !       f1_nm(mn), f3a_nm(mn), f3b_nm(mn), f3c_nm(mn)
+         ! end do
+         ! close (unit = 8)
+      ! end if
       !
       !     Build A and B matrices
       !
@@ -252,31 +187,16 @@ program tae_continua
                call scs_convolve(scsi, mi, ni, mj, nj, meq, neq)
                bmat(i, j) = bmat(i, j) - ccci * f1_nm(ieq) * mu0_rho_ion(ir)
                amat(i, j) = amat(i, j)&
-               & - (scsi * (f3a_nm(ieq) * rm_col(i) * rm_col(j)&
-               & - f3b_nm(ieq) * rm_col(j) * rn_col(i)&
-               & - f3b_nm(ieq) * rn_col(j) * rm_col(i)&
-               & + f3c_nm(ieq) * rn_col(j) * rn_col(i)))
+                  - (scsi * (f3a_nm(ieq) * rm_col(i) * rm_col(j)&
+                  - f3b_nm(ieq) * rm_col(j) * rn_col(i)&
+                  - f3b_nm(ieq) * rn_col(j) * rm_col(i)&
+                  + f3c_nm(ieq) * rn_col(j) * rn_col(i)))
             end do              !ieq = 1,mnmx
          end do                 !j=1,mn_col
       end do                  !i=1,mn_col
-      !
+
+
       !     Call matrix eigenvalue solver
-      !
-
-      ! egl = 1.d-2; egu = 0.6d0; abstol = 1.d-8
-      ! il = 0; iu = 0
-
-      ! if (.not. ipos_def_sym) then
-      !    call dggev('N', 'V', mn_col, amat, mn_col, bmat, mn_col, alfr, alfi, beta, vl, ldvl, vr, ldvr, work, lwork, info)
-      ! else if (ipos_def_sym .and. .not. subset_eq) then
-      !    call dsygv(iopt, jobz, 'L', mn_col, amat, mn_col, bmat, mn_col, omega, work, lwork, info)
-      ! else if (ipos_def_sym .and. subset_eq) then
-      !    call dsygvx(iopt, 'V', 'V', 'L', mn_col, amat, mn_col, bmat, mn_col, egl, egu, il, iu, abstol, m_red, omega, vr, &
-      !       mn_col, work, lwork, iwork, ifail, info)
-      ! end if
-      ! if (info .ne. 0) write (*, '("info = ",i8)') info
-      ! !
-
       call eigenvalue_solver
 
       do i = 1, mn_col
@@ -320,14 +240,12 @@ program tae_continua
    !
    !
    close (unit = 21)
-   close (unit = 8)
+
 
    !  Write and deallocate
    write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') mn_col, ir_fine_scl
 
-   call trg_deallocate
-   ! deallocate (alpha, beta, aux)
-   ! deallocate (alpha, beta)
+   ! call trg_deallocate
 
    call write_data_post
 

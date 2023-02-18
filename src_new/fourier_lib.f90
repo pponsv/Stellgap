@@ -5,7 +5,7 @@
 module fourier_lib
 
    use kind_spec
-   use globals
+   ! use globals
    use helper
 
    implicit none
@@ -24,7 +24,7 @@ module fourier_lib
 contains
 
    subroutine trig_array
-      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor
+      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, pi
 
       integer :: istat, nl, i, n, m, mn
       real(r8) :: dum, dnorm, arg
@@ -73,7 +73,7 @@ contains
    end subroutine trig_array
 
    subroutine convolution_array
-      use globals, only: mn_col
+      use globals, only: mn_col, ntors, mwl, mwu, rm_col, rn_col, im_col, in_col, nw
       integer :: istat, count, i, m, n
       !     First, count the number of modes to be used
       count = 0
@@ -173,9 +173,9 @@ contains
       call css(tht_int4, m2, m1, meq)
       call css(zeta_int4, n2, n1, neq)
       ans = tht_int1 * zeta_int1&
-      & + tht_int2 * zeta_int2 * sm1 * sm2 * sn1 * sn2&
-      & + tht_int3 * zeta_int3 * sm2 * smeq * sn2 * sneq&
-      & + tht_int4 * zeta_int4 * sm1 * smeq * sn1 * sneq
+         + tht_int2 * zeta_int2 * sm1 * sm2 * sn1 * sn2&
+         + tht_int3 * zeta_int3 * sm2 * smeq * sn2 * sneq&
+         + tht_int4 * zeta_int4 * sm1 * smeq * sn1 * sneq
       m1 = sm1 * m1; n1 = sn1 * n1
       m2 = sm2 * m2; n2 = sn2 * n2
       meq = smeq * meq; neq = sneq * neq
@@ -184,10 +184,11 @@ contains
    !
    !
    subroutine ccc(result, i, j, k)
+      integer, intent(in) :: i, j, k
       real(r8), parameter :: zero = 0, one = 1, &
       &two = 2, four = 4
       real(r8) :: result
-      integer :: i, j, k, izeros
+      integer :: izeros
       !
       !     This subroutine calculates the 1D integral of
       !     cos(i*x)*cos(j*x)*cos(k*x)
@@ -238,9 +239,9 @@ contains
    !
    !
    subroutine css(result, k, i, j)
+      integer, intent(in) :: i, j, k
       real(r8), parameter :: one = 1, neg_one = -1, zero = 0, &
       &two = 2, neg_two = -2
-      integer :: i, j, k
       real(r8) :: result
       !
       !     This subroutine calculates the 1D integral of
@@ -265,9 +266,9 @@ contains
    end subroutine css
    !
    !
-   subroutine trg_deallocate
-      deallocate (rm, rn, cos_ar, sin_ar, f, fnm, anm, &
-      &rm_col, rn_col, im_col, in_col)
-   end subroutine trg_deallocate
+   ! subroutine trg_deallocate
+   !    deallocate (rm, rn, cos_ar, sin_ar, f, fnm, anm, &
+   !    &rm_col, rn_col, im_col, in_col)
+   ! end subroutine trg_deallocate
 
 end module fourier_lib
