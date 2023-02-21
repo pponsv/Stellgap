@@ -17,6 +17,7 @@ set(SERIAL "SERIAL")
 
 # Paths
 set(LIBSTELL_PATH "$ENV{HOME}/bin/libstell_dir/")
+set(NETCDF_PATH "/usr/include" )
 
 # Libraries
 add_library(libstell SHARED IMPORTED)
@@ -63,6 +64,7 @@ set(MODULES_SRC "src_new/kind_spec.f90" "src_new/fourier_lib.f90" "src_new/fouri
       "src_new/post_process.f90" "src_new/fitpack.f90" "src_new/read_input.f90" "src_new/output.f90" 
       "src_new/globals.f90" "src_new/helper.f90" "src_new/eig_solver.f90" )
 add_executable(xstgap_new ${XSTGAP_NEW_SRC} ${MODULES_SRC})
-    target_link_libraries(xstgap_new lapack blas m pthread)
+    target_include_directories(xstgap_new PRIVATE ${NETCDF_PATH})
+    target_link_libraries(xstgap_new lapack blas m pthread netcdff)
     target_compile_definitions(xstgap_new PRIVATE -D${SERIAL})
     target_compile_options(xstgap_new PRIVATE -cpp -P -C -O2 -ffree-form)

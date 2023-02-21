@@ -99,4 +99,9 @@ contains
 
    ! end subroutine write_alfven_post
 
+
+   subroutine write_nc_all
+      use netcdf
+   end subroutine write_nc_all
+
 end module output
