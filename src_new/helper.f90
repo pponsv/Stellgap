@@ -2,8 +2,15 @@ module helper
 
    use kind_spec, only: r8
 
+   
    implicit none
-
+   type :: timer_
+      real(r8) :: t0, t1, dt, t0_cum, t1_cum, dt_cum
+   contains
+      procedure :: tic => tic
+      procedure :: toc  => toc
+   end type timer_
+   
 contains
 
    function outer(a, b) result(c)
@@ -126,6 +133,29 @@ contains
       end do
 
    end subroutine lingrid
+
+   subroutine tic(t, text)
+      class(timer_) :: t
+      character(len=*), optional :: text
+      integer   :: count, count_rate
+
+      if (present(text)) print *, text
+      call cpu_time(t%t0_cum)
+      call system_clock(count, count_rate)
+      t%t0 = real(count, kind=r8) / count_rate
+   end subroutine tic
+
+   subroutine toc(t)
+      class(timer_) :: t
+      integer   :: count, count_rate
+      call cpu_time(t%t1_cum)
+      t%dt_cum = t%t1_cum - t%t0_cum
+      call system_clock(count, count_rate)
+      t%t1 = real(count, kind=r8) / count_rate
+      t%dt = t%t1 - t%t0
+      print '(A, g10.5, A, g10.5, A)', &
+         "Time elapsed: ", t%dt, "s (wall)  ", t%dt_cum, "s (cum)"
+   end subroutine toc
 
 
 end module helper

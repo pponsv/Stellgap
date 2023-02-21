@@ -38,6 +38,11 @@ module globals
    real(r8), allocatable, dimension(:) :: rho, rho_fine, rn, rm, rn_col, rm_col
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:) :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
+   
+   !  Fourier variables
+   real(r8), allocatable, dimension(:) :: fnm, f, anm
+   real(r8), allocatable, dimension(:, :) :: cos_toF, sin_toF, cos_ar, sin_ar
+   ! real(r8) :: cos_ar(ith*izt, mnmx), sin_ar(ith*izt, mnmx)
 
    real(r8), allocatable, dimension(:,:,:) :: bfield, rjacob, gsssup
    real(r8), allocatable, dimension(:,:,:) :: bfield_lrg, rjacob_lrg, gsssup_lrg

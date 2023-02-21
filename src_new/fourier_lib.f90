@@ -13,33 +13,33 @@ module fourier_lib
    ! real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
 
    ! integer :: i, j, m, n, mn, istat
-   integer :: sin_type, cos_type
+   ! integer :: sin_type, cos_type
    !   Equilibrium coefficient arrays
-   ! real(r8), allocatable :: rn(:), rm(:)
-   real(r8), allocatable :: fnm(:), f(:), anm(:)
-   real(r8), allocatable :: cos_ar(:, :), sin_ar(:, :)
-   real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
+   ! real(r8), allocatable :: fnm(:), f(:), anm(:)
+   ! real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
 
 
 contains
 
    subroutine trig_array
-      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, pi
+      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, pi, fnm, &
+         f, anm, cos_toF, sin_toF, cos_ar, sin_ar
 
       integer :: istat, nl, i, n, m, mn
       real(r8) :: dum, dnorm, arg
       real(r8) :: zetas(izt), thetas(ith)
       real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith)
+      
 
       allocate (rm(mnmx), stat = istat)
       allocate (rn(mnmx), stat = istat)
       allocate (fnm(mnmx), stat = istat)
       allocate (f(ith*izt), stat = istat)
       allocate (anm(mnmx), stat = istat)
-      allocate (cos_ar(ith*izt, mnmx), stat = istat)
-      allocate (sin_ar(ith*izt, mnmx), stat = istat)
       allocate (cos_toF(ith*izt, mnmx), stat = istat)
+      allocate (cos_ar(ith*izt, mnmx), stat = istat)
       allocate (sin_toF(ith*izt, mnmx), stat = istat)
+      allocate (sin_ar(ith*izt, mnmx), stat = istat)
 
       !    Generate theta, zeta grid
       zetas  = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
@@ -58,6 +58,7 @@ contains
          end do
       end do
 
+      !  Make Fourier arrays
       do i = 1, ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
@@ -98,7 +99,6 @@ contains
          end do
       end do
       mn_col = count
-      !      write(*,*) mn_col, count
    end subroutine convolution_array
    !
    !

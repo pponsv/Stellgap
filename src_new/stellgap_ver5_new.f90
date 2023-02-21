@@ -22,6 +22,9 @@ program tae_continua
 
    real(r8), allocatable :: tmp(:), f2(:,:)
    real(r8) :: f2_avg
+   type(timer_) :: timer
+
+   real(r8), allocatable, dimension(:,:,:) :: f1_big, f2_big
 
    !!!!!!!  END PRUEBAS
 
@@ -122,25 +125,33 @@ program tae_continua
 
    call initialize_solver
 
+   f1_big = gsssup_lrg * rjacob_lrg / (bfield_lrg**2)
+   f2_big = gsssup_lrg / (rjacob_lrg * (bfield_lrg**2))
    !  Main loop
    do ir = (1), (ir_fine_scl)
 
       !  Print percentage completed
       if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i3,"%")', advance="no") 100*ir/ir_fine_scl
 
+      call timer % tic('Fourier etc')
+
       ! Make arrays to be expanded (eqs. 6, 8 of the paper)
-      f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
-      f1_avg = sum(f1) / real(izt*ith)
+      ! f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
+      ! print *, maxval(abs(f1 - f1_big(:,:,ir)))
+      f1 = f1_big(:,:,ir)
+      f1_avg = sum(f1_big(:,:,ir)) / real(izt*ith)
       if (.not. lrfp) then
-         f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         ! f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         f3c = f2_big(:,:,ir)
          f3b = iota_r(ir) * f3c
          f3a = iota_r(ir) * f3b
-         f3_avg = sum(f3c) / real(izt * ith)
+         f3_avg = sum(f3c) / real(izt * ith) !  Unused here
       else if (lrfp) then
-         f3a = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         ! f3a = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         f3a = f2_big(:,:,ir)
          f3b = iota_r_inv(ir) * f3a
          f3c = iota_r_inv(ir) * f3b
-         f3_avg = sum(f3a) / real(izt * ith)
+         f3_avg = sum(f3a) / real(izt * ith) !  Unused here
       end if
 
       !  Inútil?
@@ -163,6 +174,8 @@ program tae_continua
       !
       if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
 
+      call timer % toc
+      call timer % tic('amatrices')
       !
       !     Build A and B matrices
       !
@@ -190,10 +203,14 @@ program tae_continua
          end do                 !j=1,mn_col
       end do                  !i=1,mn_col
 
-
+      call timer%toc
       !     Call matrix eigenvalue solver
-      call eigenvalue_solver
 
+      call timer%tic('eigenvalue')
+      call eigenvalue_solver
+      call timer%toc
+
+      call timer%tic('write')
       do i = 1, mn_col
          if (iopt .eq. 1) then
             do j = 1, mn_col
@@ -230,7 +247,7 @@ program tae_continua
             end if
          end if
       end do          !do i=1,mn_col
-
+      call timer%toc
    end do       !ir=1,ir_fine_scl
    !
    !

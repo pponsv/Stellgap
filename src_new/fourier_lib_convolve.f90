@@ -1,7 +1,7 @@
 module fourier_lib_convolve
 
    use kind_spec, only: r8
-   use fourier_lib
+   ! use fourier_lib
    ! use fitpack
    ! use globals
 
@@ -10,7 +10,7 @@ module fourier_lib_convolve
 contains
 
    function toFourier_new(fin, trigtype) result(fout)
-      use fourier_lib, only: cos_toF, sin_toF
+      use globals, only: cos_toF, sin_toF
 
       real(r8), intent(in) :: fin(:,:)
       character*1, intent(in) :: trigtype
@@ -108,8 +108,10 @@ contains
 !
 !
 !
-   subroutine dbydth
-      use globals, only: mnmx, rm
+
+   subroutine dbydth(sin_type, cos_type)
+      use globals, only: mnmx, rm, anm, fnm
+      integer, intent(inout) :: sin_type, cos_type 
 !
 !    Take the theta derivative of the input Fourier amplitude array, fnm
 !    and place the result in the output Fourier amplitude array, anm.
@@ -134,8 +136,9 @@ contains
 !
 !
 !
-   subroutine dbydzt
-      use globals, only: mnmx, rn
+   subroutine dbydzt(sin_type, cos_type)
+      use globals, only: mnmx, rn, anm, fnm
+      integer, intent(inout) :: sin_type, cos_type
 !
 !    Take the zeta derivative of the input Fourier amplitude array, fnm
 !    and place the result in the output Fourier amplitude array, anm.
