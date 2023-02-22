@@ -35,7 +35,7 @@ module globals
    integer :: mn_col
    integer, allocatable, dimension(:) :: im_col, in_col
 
-   real(r8), allocatable, dimension(:) :: rho, rho_fine, rn, rm, rn_col, rm_col
+   real(r8), allocatable, dimension(:) :: rho, rho_fine, n_fourier, m_fourier, rn_col, rm_col
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:) :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
    

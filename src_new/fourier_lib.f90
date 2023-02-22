@@ -14,17 +14,17 @@ module fourier_lib
 contains
 
    subroutine trig_array
-      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, fnm, &
+      use globals, only: izt, ith, nfp, n_fourier, m_fourier, mnmx, mpol, ntor, fnm, &
          f, anm, cos_toF, sin_toF!, cos_ar, sin_ar
 
       integer :: istat, nl, i, n, m, mn
       real(r8) :: dum, dnorm, arg
       real(r8) :: zetas(izt), thetas(ith)
-      real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith)
+      real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith), tmp(izt*ith)
 
 
-      allocate (rm(mnmx), stat = istat)
-      allocate (rn(mnmx), stat = istat)
+      allocate (m_fourier(mnmx), stat = istat)
+      allocate (n_fourier(mnmx), stat = istat)
       allocate (fnm(mnmx), stat = istat)
       allocate (f(ith*izt), stat = istat)
       allocate (anm(mnmx), stat = istat)
@@ -36,7 +36,8 @@ contains
       !    Generate theta, zeta grid
       zetas  = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
       thetas = real_linspace_nolast(0._r8, 2*PI, ith)
-      call lingrid(zetas, thetas, ztgrd, thtgrd)
+      ztgrd  = pack(spread(zetas, dim=1, ncopies=ith), .true.)
+      thtgrd = pack(spread(zetas, dim=2, ncopies=ith), .true.)
 
       !    Generate Fourier mode distribution
       mn = 0
@@ -45,19 +46,19 @@ contains
          if (m .eq. 0) nl = 0
          do n = nl, ntor
             mn = mn + 1
-            rm(mn) = real(m)
-            rn(mn) = real(n * nfp)
+            m_fourier(mn) = real(m)
+            n_fourier(mn) = real(n * nfp)
          end do
       end do
 
       !  Make Fourier arrays
       do i = 1, ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
-            arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
+            arg = -n_fourier(mn) * ztgrd(i) + m_fourier(mn) * thtgrd(i)
             ! cos_ar(i, mn) = cos(arg)
             ! sin_ar(i, mn) = sin(arg)
             dnorm = 2. / real(ith*izt)
-            dum = abs(rn(mn)) + abs(rm(mn))
+            dum = abs(n_fourier(mn)) + abs(m_fourier(mn))
             if (nint(dum) .eq. 0) dnorm = .5 * dnorm
             ! cos_toF(i, mn) = cos_ar(i, mn) * dnorm
             ! sin_toF(i, mn) = sin_ar(i, mn) * dnorm

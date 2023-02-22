@@ -7,7 +7,7 @@ module output
 contains
 
    subroutine write_modes
-      use globals, only: rm, rn, mnmx, mn_col, im_col, in_col
+      use globals, only: m_fourier, n_fourier, mnmx, mn_col, im_col, in_col
 
       integer :: i
 
@@ -16,7 +16,7 @@ contains
       write (22, '("Equilibrium modes:",/)')
       write (22, '("meq    neq")')
       do i = 1, mnmx
-         write (22, '(i3,3x,i3)') int(rm(i)), int(rn(i))
+         write (22, '(i3,3x,i3)') int(m_fourier(i)), int(n_fourier(i))
       end do
       write (22, '(///,"Eigenvector modes:",/)')
       write (22, '("m    n")')
@@ -64,13 +64,13 @@ contains
 
 
    subroutine write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
-      use globals, only: mnmx, rm, rn
+      use globals, only: mnmx, m_fourier, n_fourier
       real(r8), intent(in), dimension(mnmx) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
       integer :: mn
 
       open (unit = 8, file = "coef_arrays", status = "unknown")
       do mn = 1, mnmx
-         write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') rm(mn), rn(mn), &
+         write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') m_fourier(mn), n_fourier(mn), &
             f1_nm(mn), f3a_nm(mn), f3b_nm(mn), f3c_nm(mn)
       end do
       close (unit = 8)
@@ -102,15 +102,15 @@ contains
 
 
    subroutine write_nc_all
-      use globals, only: rm, rn, mnmx, mn_col, im_col, in_col, rho_fine
+      use globals, only: m_fourier, n_fourier, mnmx, mn_col, im_col, in_col, rho_fine
 
       integer :: ierr, file_id, id_meq, id_neq, id_meig, id_neig, id_rho
 
       ierr = nf90_create(path='stellgap_out.nc', cmode=NF90_CLOBBER, ncid=file_id)
 
-      id_meq = def_1d_var(rm, file_id, name='m_eq', long_name='Equilibrium modes: m', &
+      id_meq = def_1d_var(m_fourier, file_id, name='m_eq', long_name='Equilibrium modes: m', &
          units='None', xlabel='m', data_type=NF90_INT)
-      id_neq = def_1d_var(rn, file_id, name='n_eq', long_name='Equilibrium modes: n', &
+      id_neq = def_1d_var(n_fourier, file_id, name='n_eq', long_name='Equilibrium modes: n', &
          units='None', xlabel='n', data_type=NF90_INT)
       id_meig = def_1d_var(real(im_col, r8), file_id, name='m_eig', long_name='Eigenvector modes: m', &
          units='None', xlabel='m_eig', data_type=NF90_INT)
@@ -121,8 +121,8 @@ contains
 
       ierr = nf90_enddef(file_id)
 
-      ierr = nf90_put_var(file_id, id_meq, rm)
-      ierr = nf90_put_var(file_id, id_neq, rn)
+      ierr = nf90_put_var(file_id, id_meq, m_fourier)
+      ierr = nf90_put_var(file_id, id_neq, n_fourier)
       ierr = nf90_put_var(file_id, id_meig, im_col)
       ierr = nf90_put_var(file_id, id_neig, in_col)
       ierr = nf90_put_var(file_id, id_rho, rho_fine)

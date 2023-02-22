@@ -110,7 +110,7 @@ contains
 !
 
    subroutine dbydth(sin_type, cos_type)
-      use globals, only: mnmx, rm, anm, fnm
+      use globals, only: mnmx, m_fourier, anm, fnm
       integer, intent(inout) :: sin_type, cos_type 
 !
 !    Take the theta derivative of the input Fourier amplitude array, fnm
@@ -122,9 +122,9 @@ contains
 
       do i = 1, mnmx
          if (sin_type .eq. 1 .and. cos_type .eq. 0) then
-            anm(i) = rm(i)*fnm(i)
+            anm(i) = m_fourier(i)*fnm(i)
          else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
-            anm(i) = -rm(i)*fnm(i)
+            anm(i) = -m_fourier(i)*fnm(i)
          end if
       end do
       if (sin_type .eq. 1 .and. cos_type .eq. 0) then
@@ -137,7 +137,7 @@ contains
 !
 !
    subroutine dbydzt(sin_type, cos_type)
-      use globals, only: mnmx, rn, anm, fnm
+      use globals, only: mnmx, n_fourier, anm, fnm
       integer, intent(inout) :: sin_type, cos_type
 !
 !    Take the zeta derivative of the input Fourier amplitude array, fnm
@@ -148,9 +148,9 @@ contains
       integer :: i
       do i = 1, mnmx
          if (sin_type .eq. 1 .and. cos_type .eq. 0) then
-            anm(i) = -rn(i)*fnm(i)
+            anm(i) = -n_fourier(i)*fnm(i)
          else if (sin_type .eq. 0 .and. cos_type .eq. 1) then
-            anm(i) = rn(i)*fnm(i)
+            anm(i) = n_fourier(i)*fnm(i)
          end if
       end do
       if (sin_type .eq. 1 .and. cos_type .eq. 0) then

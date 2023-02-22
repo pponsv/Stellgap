@@ -67,8 +67,51 @@ program tae_continua
 
    call convolution_array
 
-   allocate (eig_vect(mn_col), stat = istat)
+   
+   !
+   !   Open files for output
+   !
+   !      write(*,*) trim(adjustl(outfile))
+   
+   write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, "irads3:", 3*irads,"mnmx:", mnmx, &
+   "ith*izt:", ith*izt, "mn_col:", mn_col, "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
+   
+   
+   !    Boozer coordinates input - new ae-mode-structure input
+   call read_tae_data_boozer
+   
+   !    Record equilibrium and eigenfunction Fourier mode list
+   call write_modes
+   
+   !
+   !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
+   !
+   iota_r = interp_wrap_rename(rho, iotac, rho_fine)
+   iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
+   
+   select case (ion_profile)
+   case (0)
+      ion_density = (iota_r / iotac(1))**2
+    case (1)
+      ion_density = poly_eval(rho_fine, nion)
+   case (2)
+      ion_density = 1._r8
+   case (3)
+      ion_density = (1. - aion * (rho_fine**bion))**cion
+   end select
+   
+   mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
+   
+   call write_ion_profile
+   
+   !  Interpolate field, jacobian and gss
+   bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
+   rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
+   gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
+   !  Allocate arrays for fourier expansions etc
+   
+   allocate (eig_vect(mn_col), stat = istat)
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
    allocate (f3b_nm(mnmx), stat = istat)
@@ -77,50 +120,8 @@ program tae_continua
    allocate (f3a(izt, ith), stat = istat)
    allocate (f3b(izt, ith), stat = istat)
    allocate (f3c(izt, ith), stat = istat)
+   allocate (f2(mnmx), stat = istat)   !PRUEBA
 
-
-   allocate (f2(mnmx), stat = istat)
-
-   !
-   !   Open files for output
-   !
-   !      write(*,*) trim(adjustl(outfile))
-
-   write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, "irads3:", 3*irads,"mnmx:", mnmx, &
-      "ith*izt:", ith*izt, "mn_col:", mn_col, "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
-
-
-   !    Boozer coordinates input - new ae-mode-structure input
-   call read_tae_data_boozer
-
-   !    Record equilibrium and eigenfunction Fourier mode list
-   call write_modes
-
-   !
-   !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
-   !
-   iota_r = interp_wrap_rename(rho, iotac, rho_fine)
-   iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
-
-   select case (ion_profile)
-    case (0)
-      ion_density = (iota_r / iotac(1))**2
-    case (1)
-      ion_density = poly_eval(rho_fine, nion)
-    case (2)
-      ion_density = 1._r8
-    case (3)
-      ion_density = (1. - aion * (rho_fine**bion))**cion
-   end select
-
-   mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
-
-   call write_ion_profile
-
-   !  Interpolate field, jacobian and gss
-   bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
-   rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
-   gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
    open (unit = 21, file = "alfven_spec", status = "unknown")
 
@@ -163,8 +164,6 @@ program tae_continua
             f1 = f1_avg
          end if
       end if
-      !call timer%toc
-      !call timer%tic('toFourier')
 
       !     Generate Fourier spectra of above gridded coefficients
       !
@@ -178,10 +177,8 @@ program tae_continua
 
       !     Write out coefficient spectra if half way out in flux
       !
-      if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
+      if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)  ! Why?
 
-      !call timer % toc
-      !call timer % tic('amatrices')
       !
       !     Build A and B matrices
       !
@@ -195,8 +192,8 @@ program tae_continua
             mi = im_col(i)
             mj = im_col(j)
             do ieq = 1, mnmx
-               meq = rm(ieq)
-               neq = rn(ieq)
+               meq = nint(m_fourier(ieq))
+               neq = nint(n_fourier(ieq))
                call ccc_convolve(ccci, mi, ni, mj, nj, meq, neq)
                call scs_convolve(scsi, mi, ni, mj, nj, meq, neq)
                bmat(i, j) = bmat(i, j) - ccci * f1_nm(ieq) * mu0_rho_ion(ir)
