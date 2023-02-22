@@ -1,6 +1,7 @@
 module output
 
    use kind_spec
+   use netcdf
    implicit none
 
 contains
@@ -101,7 +102,63 @@ contains
 
 
    subroutine write_nc_all
-      use netcdf
+      use globals, only: rm, rn, mnmx, mn_col, im_col, in_col, rho_fine
+
+      integer :: ierr, file_id, id_meq, id_neq, id_meig, id_neig, id_rho
+
+      ierr = nf90_create(path='stellgap_out.nc', cmode=NF90_CLOBBER, ncid=file_id)
+
+      id_meq = def_1d_var(rm, file_id, name='m_eq', long_name='Equilibrium modes: m', &
+         units='None', xlabel='m', data_type=NF90_INT)
+      id_neq = def_1d_var(rn, file_id, name='n_eq', long_name='Equilibrium modes: n', &
+         units='None', xlabel='n', data_type=NF90_INT)
+      id_meig = def_1d_var(real(im_col, r8), file_id, name='m_eig', long_name='Eigenvector modes: m', &
+         units='None', xlabel='m_eig', data_type=NF90_INT)
+      id_neig = def_1d_var(real(in_col, r8), file_id, name='n_eig', long_name='Eigenvector modes: n', &
+         units='None', xlabel='n_eig', data_type=NF90_INT)
+      id_rho = def_1d_var(rho_fine, file_id, name='rho', long_name='Radial coordinate', &
+         units='None', xlabel='rho', data_type=NF90_INT)
+
+      ierr = nf90_enddef(file_id)
+
+      ierr = nf90_put_var(file_id, id_meq, rm)
+      ierr = nf90_put_var(file_id, id_neq, rn)
+      ierr = nf90_put_var(file_id, id_meig, im_col)
+      ierr = nf90_put_var(file_id, id_neig, in_col)
+      ierr = nf90_put_var(file_id, id_rho, rho_fine)
+
+      ierr = nf90_close(file_id)
+
    end subroutine write_nc_all
+
+   function def_2d_var(a, file_id, name, long_name, units, xlabel, ylabel, data_type) result(array_id)
+      real(r8), intent(in) :: a(:,:)
+      integer, intent(in) :: file_id, data_type
+      character(len=*), intent(in) :: name, units, xlabel, ylabel, long_name
+
+      integer :: ierr, xdim_id, ydim_id, array_id
+
+      ierr = nf90_def_dim(file_id, xlabel, size(a, dim=1), xdim_id)
+      ierr = nf90_def_dim(file_id, ylabel, size(a, dim=2), ydim_id)
+      ierr = nf90_def_var(file_id, name, data_type, [xdim_id, ydim_id], array_id)
+      ierr = nf90_put_att(file_id, array_id, "units", units)
+      ierr = nf90_put_att(file_id, array_id, "long_name", long_name)
+
+   end function def_2d_var
+
+
+   function def_1d_var(a, file_id, name, long_name, units, xlabel, data_type) result(array_id)
+      real(r8), intent(in) :: a(:)
+      integer, intent(in) :: file_id, data_type
+      character(len=*), intent(in) :: name, units, xlabel, long_name
+
+      integer :: ierr, xdim_id, array_id
+
+      ierr = nf90_def_dim(file_id, xlabel, size(a), xdim_id)
+      ierr = nf90_def_var(file_id, name, data_type, xdim_id, array_id)
+      ierr = nf90_put_att(file_id, array_id, "units", units)
+      ierr = nf90_put_att(file_id, array_id, "long_name", long_name)
+
+   end function def_1d_var
 
 end module output

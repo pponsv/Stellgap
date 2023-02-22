@@ -71,7 +71,7 @@ contains
       read (arg1, '(i3)') irads
       read (arg2, '(i4)') ir_fine_scl
 
-      write (*, '("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)') irads, 3*irads, ir_fine_scl
+      ! write (*, '("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)') irads, 3*irads, ir_fine_scl
 
    end subroutine read_args
 

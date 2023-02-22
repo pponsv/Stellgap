@@ -10,26 +10,18 @@ module fourier_lib
 
    implicit none
 
-   ! real(r8), parameter :: parity_gss = 1., parity_bsupth = 1., parity_bsupzt = 1.
-
-   ! integer :: i, j, m, n, mn, istat
-   ! integer :: sin_type, cos_type
-   !   Equilibrium coefficient arrays
-   ! real(r8), allocatable :: fnm(:), f(:), anm(:)
-   ! real(r8), allocatable :: cos_toF(:, :), sin_toF(:, :)
-
 
 contains
 
    subroutine trig_array
-      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, pi, fnm, &
-         f, anm, cos_toF, sin_toF, cos_ar, sin_ar
+      use globals, only: izt, ith, nfp, rn, rm, mnmx, mpol, ntor, fnm, &
+         f, anm, cos_toF, sin_toF!, cos_ar, sin_ar
 
       integer :: istat, nl, i, n, m, mn
       real(r8) :: dum, dnorm, arg
       real(r8) :: zetas(izt), thetas(ith)
       real(r8) :: thtgrd(izt*ith), ztgrd(izt*ith)
-      
+
 
       allocate (rm(mnmx), stat = istat)
       allocate (rn(mnmx), stat = istat)
@@ -37,9 +29,9 @@ contains
       allocate (f(ith*izt), stat = istat)
       allocate (anm(mnmx), stat = istat)
       allocate (cos_toF(ith*izt, mnmx), stat = istat)
-      allocate (cos_ar(ith*izt, mnmx), stat = istat)
+      ! allocate (cos_ar(ith*izt, mnmx), stat = istat)
       allocate (sin_toF(ith*izt, mnmx), stat = istat)
-      allocate (sin_ar(ith*izt, mnmx), stat = istat)
+      ! allocate (sin_ar(ith*izt, mnmx), stat = istat)
 
       !    Generate theta, zeta grid
       zetas  = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
@@ -62,13 +54,15 @@ contains
       do i = 1, ith*izt
          do mn = 1, mnmx ! =(2*ntor + 1)*mpol - ntor
             arg = -rn(mn) * ztgrd(i) + rm(mn) * thtgrd(i)
-            cos_ar(i, mn) = cos(arg)
-            sin_ar(i, mn) = sin(arg)
+            ! cos_ar(i, mn) = cos(arg)
+            ! sin_ar(i, mn) = sin(arg)
             dnorm = 2. / real(ith*izt)
             dum = abs(rn(mn)) + abs(rm(mn))
             if (nint(dum) .eq. 0) dnorm = .5 * dnorm
-            cos_toF(i, mn) = cos_ar(i, mn) * dnorm
-            sin_toF(i, mn) = sin_ar(i, mn) * dnorm
+            ! cos_toF(i, mn) = cos_ar(i, mn) * dnorm
+            ! sin_toF(i, mn) = sin_ar(i, mn) * dnorm
+            cos_toF(i, mn) = cos(arg) * dnorm
+            sin_toF(i, mn) = sin(arg) * dnorm
          end do
       end do
    end subroutine trig_array

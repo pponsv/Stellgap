@@ -12,14 +12,14 @@ rmlink:
 	rm -f ~/.local/bin/xmetric
 
 build:
-	mkdir -p ./build
-	cmake --build ./build --target xstgap_new
+	mkdir -p ./bld
+	cmake --build ./bld --target xstgap_new
 
 clean:
-	cmake --build ./build --target clean
+	cmake --build ./bld --target clean
 
 clean_bld:
 	rm -rf bld/*
 
 build_all:
-	cmake --build ./build --target all
+	cmake --build ./bld --target all

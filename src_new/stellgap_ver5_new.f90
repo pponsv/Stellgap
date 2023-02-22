@@ -20,7 +20,7 @@ program tae_continua
 
    !!!!!!!  PRUEBAS
 
-   real(r8), allocatable :: tmp(:), f2(:,:)
+   real(r8), allocatable :: tmp(:), f2(:)
    real(r8) :: f2_avg
    type(timer_) :: timer
 
@@ -79,14 +79,15 @@ program tae_continua
    allocate (f3c(izt, ith), stat = istat)
 
 
-   allocate (f2(izt, ith), stat = istat)
+   allocate (f2(mnmx), stat = istat)
 
    !
    !   Open files for output
    !
    !      write(*,*) trim(adjustl(outfile))
 
-   write (*, *) izt, ith, irads, mnmx, ith*izt, mn_col
+   write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, "irads3:", 3*irads,"mnmx:", mnmx, &
+      "ith*izt:", ith*izt, "mn_col:", mn_col, "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
 
 
    !    Boozer coordinates input - new ae-mode-structure input
@@ -127,13 +128,13 @@ program tae_continua
 
    f1_big = gsssup_lrg * rjacob_lrg / (bfield_lrg**2)
    f2_big = gsssup_lrg / (rjacob_lrg * (bfield_lrg**2))
+
    !  Main loop
-   do ir = (1), (ir_fine_scl)
+   do ir = 1, ir_fine_scl
 
       !  Print percentage completed
       if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i3,"%")', advance="no") 100*ir/ir_fine_scl
 
-      call timer % tic('Fourier etc')
 
       ! Make arrays to be expanded (eqs. 6, 8 of the paper)
       ! f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
@@ -162,20 +163,25 @@ program tae_continua
             f1 = f1_avg
          end if
       end if
+      !call timer%toc
+      !call timer%tic('toFourier')
 
       !     Generate Fourier spectra of above gridded coefficients
       !
-      f1_nm  = toFourier_new(f1, trigtype='c') !  Si le quitas el transpose desaparecen los gaps??
+      f1_nm  = toFourier_new(f1_big(:,:,ir), trigtype='c') !  Si le quitas el transpose desaparecen los gaps??
       f3a_nm = toFourier_new(f3a, trigtype='c')
       f3b_nm = toFourier_new(f3b, trigtype='c')
       f3c_nm = toFourier_new(f3c, trigtype='c')
+      f2 = toFourier_new(f2_big(:,:,ir), trigtype='c')
+
+      ! print *, maxval(abs(f2 - f3c_nm))
 
       !     Write out coefficient spectra if half way out in flux
       !
       if (ir .eq. ir_fine_scl / 2) call write_coef_arrays(f1_nm, f3a_nm, f3b_nm, f3c_nm)
 
-      call timer % toc
-      call timer % tic('amatrices')
+      !call timer % toc
+      !call timer % tic('amatrices')
       !
       !     Build A and B matrices
       !
@@ -183,7 +189,7 @@ program tae_continua
          do j = 1, mn_col
             bmat(i, j) = 0
             amat(i, j) = 0
-            if (i .lt. j .and. ipos_def_sym) cycle     !i.e. symmetric storage mode: only need bottom half
+            if ((i .lt. j) .and. ipos_def_sym)  cycle     !i.e. symmetric storage mode: only need bottom half
             ni = in_col(i)
             nj = in_col(j)
             mi = im_col(i)
@@ -203,14 +209,8 @@ program tae_continua
          end do                 !j=1,mn_col
       end do                  !i=1,mn_col
 
-      call timer%toc
-      !     Call matrix eigenvalue solver
-
-      call timer%tic('eigenvalue')
       call eigenvalue_solver
-      call timer%toc
 
-      call timer%tic('write')
       do i = 1, mn_col
          if (iopt .eq. 1) then
             do j = 1, mn_col
@@ -247,7 +247,7 @@ program tae_continua
             end if
          end if
       end do          !do i=1,mn_col
-      call timer%toc
+
    end do       !ir=1,ir_fine_scl
    !
    !
@@ -255,13 +255,21 @@ program tae_continua
 
 
    !  Write and deallocate
-   write (*, '("modes = ",i5,2x,"no. of radial points = ",i5)') mn_col, ir_fine_scl
-
-   ! call trg_deallocate
+   write (*, '(/,"modes = ",i5,2x,"no. of radial points = ",i5)') mn_col, ir_fine_scl
 
    call write_data_post
 
    call post_process
 
-   stop
+   call write_nc_all
+
+! contains
+
+!    function make_amatrix() result(amat)
+
+!    end function make_amatrix
+
+!    function make_bmatrix() result(bmat)
+
+!    end function make_bmatrix
 end program tae_continua

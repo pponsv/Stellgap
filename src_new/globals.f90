@@ -41,8 +41,7 @@ module globals
    
    !  Fourier variables
    real(r8), allocatable, dimension(:) :: fnm, f, anm
-   real(r8), allocatable, dimension(:, :) :: cos_toF, sin_toF, cos_ar, sin_ar
-   ! real(r8) :: cos_ar(ith*izt, mnmx), sin_ar(ith*izt, mnmx)
+   real(r8), allocatable, dimension(:, :) :: cos_toF, sin_toF !cos_ar, sin_ar
 
    real(r8), allocatable, dimension(:,:,:) :: bfield, rjacob, gsssup
    real(r8), allocatable, dimension(:,:,:) :: bfield_lrg, rjacob_lrg, gsssup_lrg
