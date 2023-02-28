@@ -30,7 +30,7 @@ program tae_continua
 
    !  Dummy integers for loops
 
-   integer :: ir, istat, i, j, mn
+   integer :: ir, istat, i, j
    integer :: ni, nj, mi, mj, ieq, meq, neq
    integer :: j_max_index, m_emax, n_emax
 
@@ -67,50 +67,51 @@ program tae_continua
 
    call convolution_array
 
-   
+
    !
    !   Open files for output
    !
    !      write(*,*) trim(adjustl(outfile))
-   
-   write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, "irads3:", 3*irads,"mnmx:", mnmx, &
-   "ith*izt:", ith*izt, "mn_col:", mn_col, "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
-   
-   
+
+   write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, &
+      "irads3:", 3*irads,"mnmx:", mnmx, "ith*izt:", ith*izt, "mn_col:", mn_col, &
+      "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
+
+
    !    Boozer coordinates input - new ae-mode-structure input
    call read_tae_data_boozer
-   
+
    !    Record equilibrium and eigenfunction Fourier mode list
    call write_modes
-   
+
    !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
    !
    iota_r = interp_wrap_rename(rho, iotac, rho_fine)
    iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
-   
+
    select case (ion_profile)
-   case (0)
+    case (0)
       ion_density = (iota_r / iotac(1))**2
     case (1)
       ion_density = poly_eval(rho_fine, nion)
-   case (2)
+    case (2)
       ion_density = 1._r8
-   case (3)
+    case (3)
       ion_density = (1. - aion * (rho_fine**bion))**cion
    end select
-   
+
    mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
-   
+
    call write_ion_profile
-   
+
    !  Interpolate field, jacobian and gss
    bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
    rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
    gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
 
    !  Allocate arrays for fourier expansions etc
-   
+
    allocate (eig_vect(mn_col), stat = istat)
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
