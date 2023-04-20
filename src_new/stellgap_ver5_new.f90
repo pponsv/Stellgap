@@ -135,7 +135,7 @@ program tae_continua
    do ir = 1, ir_fine_scl
 
       !  Print percentage completed
-      if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i3,"%")', advance="no") 100*ir/ir_fine_scl
+      if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i4,"%")', advance="no") 100*ir/ir_fine_scl
 
 
       ! Make arrays to be expanded (eqs. 6, 8 of the paper)
