@@ -20,7 +20,7 @@ program tae_continua
 
    !!!!!!!  PRUEBAS
 
-   real(r8), allocatable :: tmp(:), f2(:)
+   real(r8), allocatable :: tmp(:)
    real(r8) :: f2_avg
    integer :: tmp1
    type(timer_) :: timer
@@ -37,7 +37,7 @@ program tae_continua
 
    real(r8) :: ccci, scsi, f1_avg, f3_avg
 
-   real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
+   real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm, f2_nm
    ! real(r8), allocatable, dimension(:) :: eig_vect
    real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
 
@@ -121,7 +121,7 @@ program tae_continua
    allocate (f3a(izt, ith), stat = istat)
    allocate (f3b(izt, ith), stat = istat)
    allocate (f3c(izt, ith), stat = istat)
-   allocate (f2(mnmx), stat = istat)   !PRUEBA
+   allocate (f2_nm(mnmx), stat = istat)   !PRUEBA
 
 
    open (unit = 21, file = "alfven_spec", status = "unknown")
@@ -137,27 +137,17 @@ program tae_continua
       !  Print percentage completed
       if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i4,"%")', advance="no") 100*ir/ir_fine_scl
 
-
-      ! Make arrays to be expanded (eqs. 6, 8 of the paper)
-      ! f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
-      ! print *, maxval(abs(f1 - f1_big(:,:,ir)))
-      ! f1 = f1_big(:,:,ir)
-      ! f1_avg = sum(f1_big(:,:,ir)) / real(izt*ith)
-      ! if (.not. lrfp) then
       select case (lrfp)
        case (.true.)
-         ! f3a = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
          f3a = f2_big(:,:,ir)
          f3b = iota_r_inv(ir) * f3a
          f3c = iota_r_inv(ir) * f3b
          ! f3_avg = sum(f3a) / real(izt * ith) !  Unused here
        case (.false.)
-         ! f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
          f3c = f2_big(:,:,ir)
          f3b = iota_r(ir) * f3c
          f3a = iota_r(ir) * f3b
          ! f3_avg = sum(f3c) / real(izt * ith) !  Unused here
-         ! else if (lrfp) then
       end select
 
       !  Inútil?
@@ -175,7 +165,7 @@ program tae_continua
       f3a_nm = toFourier_new(f3a, trigtype='c')
       f3b_nm = toFourier_new(f3b, trigtype='c')
       f3c_nm = toFourier_new(f3c, trigtype='c')
-      f2 = toFourier_new(f2_big(:,:,ir), trigtype='c')
+      f2_nm = toFourier_new(f2_big(:,:,ir), trigtype='c')
 
       ! print *, maxval(abs(f2 - f3c_nm))
 
