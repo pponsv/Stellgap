@@ -77,6 +77,45 @@ contains
 
    end subroutine write_coef_arrays
 
+   subroutine write_output(ir)
+      use globals, only: iopt, mn_col, ipos_def_sym, jobz, subset_eq, im_col, in_col, rho_fine
+      use eig_solver, only: amat, vr, omega, alfr, alfi, beta
+
+      integer, intent(in) :: ir
+      real(r8) :: eig_vect(mn_col)
+      integer :: i, j, j_max_index, m_emax, n_emax
+
+      do i = 1, mn_col
+         select case (iopt)
+          case (1)
+            do j = 1, mn_col
+               if (ipos_def_sym .and. jobz .eq. 'V' .and. .not. subset_eq) then
+                  eig_vect(j) = abs(amat(j, i))
+               end if
+               if (.not. ipos_def_sym) eig_vect(j) = abs(vr(j, i))
+            end do
+
+            j_max_index = maxloc(eig_vect, dim=1)
+            m_emax = im_col(j_max_index)
+            n_emax = in_col(j_max_index)
+
+            select case (ipos_def_sym)
+             case (.true.)
+               write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), m_emax, n_emax
+             case (.false.)
+               write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), alfi(i), beta(i), m_emax, n_emax
+            end select
+          case (0)
+            select case (ipos_def_sym)
+             case (.true.)
+               write (21, '(e15.7,2x,e15.7)') rho_fine(ir), sqrt(abs(omega(i)))
+             case (.false.)
+               write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), alfi(i), beta(i)
+            end select
+         end select
+      end do          !do i=1,mn_col
+   end subroutine write_output
+
 
    ! subroutine write_alfven_post(ipos_def_sym, iopt)
    !    use globals, only: rho_fine

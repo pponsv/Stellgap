@@ -22,6 +22,7 @@ program tae_continua
 
    real(r8), allocatable :: tmp(:), f2(:)
    real(r8) :: f2_avg
+   integer :: tmp1
    type(timer_) :: timer
 
    real(r8), allocatable, dimension(:,:,:) :: f1_big, f2_big
@@ -32,13 +33,12 @@ program tae_continua
 
    integer :: ir, istat, i, j
    integer :: ni, nj, mi, mj, ieq, meq, neq
-   integer :: j_max_index, m_emax, n_emax
 
 
-   real(r8) :: eig_max, ccci, scsi, f1_avg, f3_avg
+   real(r8) :: ccci, scsi, f1_avg, f3_avg
 
    real(r8), allocatable, dimension(:) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
-   real(r8), allocatable, dimension(:) :: eig_vect
+   ! real(r8), allocatable, dimension(:) :: eig_vect
    real(r8), allocatable, dimension(:,:) :: f1, f3a, f3b, f3c
 
 
@@ -112,7 +112,7 @@ program tae_continua
 
    !  Allocate arrays for fourier expansions etc
 
-   allocate (eig_vect(mn_col), stat = istat)
+   ! allocate (eig_vect(mn_col), stat = istat)
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
    allocate (f3b_nm(mnmx), stat = istat)
@@ -141,21 +141,24 @@ program tae_continua
       ! Make arrays to be expanded (eqs. 6, 8 of the paper)
       ! f1 = gsssup_lrg(:, :, ir) * rjacob_lrg(:, :, ir) / (bfield_lrg(:, :, ir)**2)
       ! print *, maxval(abs(f1 - f1_big(:,:,ir)))
-      f1 = f1_big(:,:,ir)
-      f1_avg = sum(f1_big(:,:,ir)) / real(izt*ith)
-      if (.not. lrfp) then
-         ! f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
-         f3c = f2_big(:,:,ir)
-         f3b = iota_r(ir) * f3c
-         f3a = iota_r(ir) * f3b
-         f3_avg = sum(f3c) / real(izt * ith) !  Unused here
-      else if (lrfp) then
+      ! f1 = f1_big(:,:,ir)
+      ! f1_avg = sum(f1_big(:,:,ir)) / real(izt*ith)
+      ! if (.not. lrfp) then
+      select case (lrfp)
+       case (.true.)
          ! f3a = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
          f3a = f2_big(:,:,ir)
          f3b = iota_r_inv(ir) * f3a
          f3c = iota_r_inv(ir) * f3b
-         f3_avg = sum(f3a) / real(izt * ith) !  Unused here
-      end if
+         ! f3_avg = sum(f3a) / real(izt * ith) !  Unused here
+       case (.false.)
+         ! f3c = gsssup_lrg(:, :, ir) / (rjacob_lrg(:, :, ir) * (bfield_lrg(:, :, ir)**2))
+         f3c = f2_big(:,:,ir)
+         f3b = iota_r(ir) * f3c
+         f3a = iota_r(ir) * f3b
+         ! f3_avg = sum(f3c) / real(izt * ith) !  Unused here
+         ! else if (lrfp) then
+      end select
 
       !  Inútil?
       if (cyl) then
@@ -209,42 +212,7 @@ program tae_continua
 
       call eigenvalue_solver
 
-      do i = 1, mn_col
-         if (iopt .eq. 1) then
-            do j = 1, mn_col
-               if (ipos_def_sym .and. jobz .eq. 'V' .and. .not. subset_eq) then
-                  eig_vect(j) = abs(amat(j, i))
-               end if
-               if (.not. ipos_def_sym) eig_vect(j) = abs(vr(j, i))
-            end do
-
-            eig_max = -1.d+30
-            do j = 1, mn_col
-               if (eig_vect(j) .gt. eig_max) then
-                  eig_max = eig_vect(j)
-                  j_max_index = j
-               end if
-            end do
-            m_emax = im_col(j_max_index)
-            n_emax = in_col(j_max_index)
-
-            !       if(ir .eq. 5 .and. i .eq. mn_col/2)
-            !     >   write(*,'(e15.7,2x,i4,2(2x,i4))') eig_max,m_emax,n_emax,
-            !     >    j_max_index
-
-            if (ipos_def_sym) then
-               write (21, '(2(e15.7,2x),i4,2x,i4)') rho_fine(ir), sqrt(abs(omega(i))), m_emax, n_emax
-            else if (.NOT. ipos_def_sym) then
-               write (21, '(4(e15.7,2x),i4,2x,i4)') rho_fine(ir), alfr(i), alfi(i), beta(i), m_emax, n_emax
-            end if
-         else if (iopt .eq. 0) then
-            if (ipos_def_sym) then
-               write (21, '(e15.7,2x,e15.7)') rho_fine(ir), sqrt(abs(omega(i)))
-            else if (.NOT. ipos_def_sym) then
-               write (21, '(e15.7,3(2x,e15.7))') rho_fine(ir), alfr(i), alfi(i), beta(i)
-            end if
-         end if
-      end do          !do i=1,mn_col
+      call write_output(ir)
 
    end do       !ir=1,ir_fine_scl
    !
@@ -261,7 +229,9 @@ program tae_continua
 
    call write_nc_all
 
-! contains
+contains
+
+
 
 !    function make_amatrix() result(amat)
 

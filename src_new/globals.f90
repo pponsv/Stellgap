@@ -6,12 +6,12 @@ module globals
    implicit none
 
    !  PARAMETERS
-   
+
    character(len=1), parameter :: jobz = 'V'
    logical, parameter :: subset_eq = .false.    !  Request a bracketed subset of eigenvalues. Not implemented?
    logical, parameter :: ipos_def_sym = .false. !  TODO???
-   logical, parameter :: lrfp = .false.         ! If true: use reversed field pinch settings
-   logical, parameter :: cyl = .false.          ! If true: cylindrical geometry???
+   logical, parameter :: lrfp = .false.         !  If true: use reversed field pinch settings
+   logical, parameter :: cyl = .false.          !  If true: cylindrical geometry???
    integer, parameter :: iopt = 1               !  Specifies problem to be solved by dggev, dsygv, dsygvx
    real(r8), parameter :: scale_khz = (1.d+3 * 2 * PI)**2
 
@@ -38,7 +38,7 @@ module globals
    real(r8), allocatable, dimension(:) :: rho, rho_fine, n_fourier, m_fourier, rn_col, rm_col
    real(r8), allocatable, dimension(:) :: iotac, phipc, theta_tae, zeta_tae
    real(r8), allocatable, dimension(:) :: mu0_rho_ion, ion_density, iota_r, iota_r_inv
-   
+
    !  Fourier variables
    real(r8), allocatable, dimension(:) :: fnm, f, anm
    real(r8), allocatable, dimension(:, :) :: cos_toF, sin_toF !cos_ar, sin_ar
