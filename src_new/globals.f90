@@ -1,7 +1,7 @@
 module globals
 !  Module for global variables
 
-   use kind_spec
+   use constants
 
    implicit none
 

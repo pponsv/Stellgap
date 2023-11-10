@@ -4,7 +4,7 @@
 !
 module fourier_lib
 
-   use kind_spec
+   use constants
    ! use globals
    use helper
 

@@ -122,7 +122,7 @@
 program tae_continua
    use fourier_lib
    use Fourier_lib_convolve
-   use kind_spec
+   use constants
    use postprocess
    use fitpack
    implicit none
@@ -417,7 +417,7 @@ program tae_continua
       end if
 
       mu0_rho_ion(irr) = mu0*mass_ion*ion_density_0&
-                        &*ion_density(irr)*scale_khz
+      &*ion_density(irr)*scale_khz
       va = sqrt(bfavg**2/(mu0_rho_ion(irr)/scale_khz))
       if (mype .eq. 0)&
       &write (9, 67) r_pt, ion_density_0*ion_density(irr),&

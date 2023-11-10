@@ -20,7 +20,7 @@ use read_boozer_mod, iota_bw => iota_b, bmnc_bw => bmnc_b, &
 &pmns_bw => pmns_b, pres_bw => pres_b, phip_bw => phip_b, &
 &bvco_bw => bvco_b, buco_bw => buco_b, ixm_bw => ixm_b, &
 &ixn_bw => ixn_b
-use kind_spec
+use constants
 !
 !
 implicit none

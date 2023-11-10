@@ -1,7 +1,7 @@
 module Fourier_lib_convolve
    use fourier_lib
    use fitpack
-   use kind_spec
+   use constants
    implicit none
 
 contains

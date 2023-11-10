@@ -1,6 +1,6 @@
 module input
 
-   use kind_spec
+   use constants
 
    implicit none
 
@@ -110,7 +110,7 @@ contains
       allocate (nw(ntors), stat=istat)
       allocate (mwl(ntors), stat=istat)
       allocate (mwu(ntors), stat=istat)
-      
+
       do i = 1, ntors
          read (20, *) nw(i), mwl(i), mwu(i)
       end do

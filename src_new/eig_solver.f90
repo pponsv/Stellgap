@@ -1,7 +1,6 @@
 module eig_solver
 
-   use globals, only: ipos_def_sym, mn_col, subset_eq, iopt, jobz
-   use kind_spec, only: r8
+   use constants, only: r8
 
    implicit none
 
@@ -22,6 +21,7 @@ module eig_solver
 contains
 
    subroutine initialize_solver
+      use globals, only: mn_col
       integer :: istat
 
       lwork = 20 * mn_col
@@ -42,6 +42,7 @@ contains
 
 
    subroutine eigenvalue_solver
+      use globals, only: ipos_def_sym, mn_col, subset_eq, iopt, jobz
       ! real(r8) :: beta
       real(r8) :: egl, egu, abstol
       integer :: il, iu, info

@@ -4,7 +4,7 @@
 !
 module fourier_lib
 
-   use kind_spec
+   use constants
    use input, only : ith, izt, mpol, ntor, nznt, mnmx, ntors, nfp, &
       mode_family, nw, mwl, mwu
 

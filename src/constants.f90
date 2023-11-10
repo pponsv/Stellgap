@@ -1,4 +1,4 @@
-module kind_spec
+module constants
    !
    !     Double precision
    !
@@ -16,4 +16,4 @@ module kind_spec
 
    logical, parameter :: ipos_def_sym = .false.
 
-end module kind_spec
+end module constants

@@ -1,8 +1,8 @@
 module helper
 
-   use kind_spec, only: r8
+   use constants, only: r8
 
-   
+
    implicit none
    type :: timer_
       real(r8) :: t0, t1, dt, t0_cum, t1_cum, dt_cum
@@ -10,7 +10,7 @@ module helper
       procedure :: tic => tic
       procedure :: toc  => toc
    end type timer_
-   
+
 contains
 
    function outer(a, b) result(c)

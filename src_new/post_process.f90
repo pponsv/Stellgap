@@ -1,6 +1,6 @@
 module postprocess
 
-   use kind_spec
+   use constants
 
    implicit none
 

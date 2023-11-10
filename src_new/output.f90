@@ -1,6 +1,6 @@
 module output
 
-   use kind_spec
+   use constants
    use netcdf
    implicit none
 

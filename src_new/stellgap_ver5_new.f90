@@ -2,7 +2,7 @@ program tae_continua
 
    !  Serial version
 
-   use kind_spec
+   use constants
    use globals
    use fourier_lib
    use fourier_lib_convolve

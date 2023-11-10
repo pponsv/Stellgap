@@ -1,11 +1,11 @@
 module input
 
-   use kind_spec
+   use constants
 
    implicit none
 
    public
-   
+
    !  read_args (command line)
    character*10 :: arg1, arg2
    integer :: irads, ir_fine_scl, irad3

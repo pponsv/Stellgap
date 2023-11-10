@@ -135,7 +135,7 @@
 program tae_continua
    use fourier_lib
    use Fourier_lib_convolve
-   use kind_spec
+   use constants
    use postprocess
    use fitpack
    implicit none

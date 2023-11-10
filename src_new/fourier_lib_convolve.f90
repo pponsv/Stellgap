@@ -1,6 +1,6 @@
 module fourier_lib_convolve
 
-   use kind_spec, only: r8
+   use constants, only: r8
    ! use fourier_lib
    ! use fitpack
    ! use globals
@@ -111,7 +111,7 @@ contains
 
    subroutine dbydth(sin_type, cos_type)
       use globals, only: mnmx, m_fourier, anm, fnm
-      integer, intent(inout) :: sin_type, cos_type 
+      integer, intent(inout) :: sin_type, cos_type
 !
 !    Take the theta derivative of the input Fourier amplitude array, fnm
 !    and place the result in the output Fourier amplitude array, anm.
