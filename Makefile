@@ -13,6 +13,7 @@ rmlink:
 
 configure:
 	cmake -S . -B ./bld
+	
 build:
 	cmake --build ./bld --target xstgap
 
