@@ -24,7 +24,7 @@ contains
       use globals, only: mn_col
       integer :: istat
 
-      lwork = 20 * mn_col
+      lwork = 100 * mn_col
 
       allocate (amat(mn_col, mn_col), stat = istat)
       allocate (bmat(mn_col, mn_col), stat = istat)

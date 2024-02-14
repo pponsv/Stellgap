@@ -135,7 +135,9 @@ program tae_continua
    do ir = 1, ir_fine_scl
 
       !  Print percentage completed
-      if (modulo(ir, ir_fine_scl/10) .eq. 0) write(*,fmt='(i4,"%")', advance="no") 100*ir/ir_fine_scl
+      if (modulo(ir, ir_fine_scl/10) .eq. 0) then
+         write(*,fmt='(1A1, i4, "%")', advance="no") char(13), 100*ir/ir_fine_scl
+      end if
 
       select case (lrfp)
        case (.true.)
