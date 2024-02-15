@@ -87,8 +87,8 @@ program tae_continua
    !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
    !
-   iota_r = interp_wrap_rename(rho, iotac, rho_fine)
-   iota_r_inv = interp_wrap_rename(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
+   iota_r = interpolate_using_spline(rho, iotac, rho_fine)
+   iota_r_inv = interpolate_using_spline(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
 
    select case (ion_profile)
     case (0)
@@ -106,9 +106,9 @@ program tae_continua
    call write_ion_profile
 
    !  Interpolate field, jacobian and gss
-   bfield_lrg = interp_3d_s(bfield, rho, rho_fine)
-   rjacob_lrg = interp_3d_s(rjacob, rho, rho_fine)
-   gsssup_lrg = interp_3d_s(gsssup, rho, rho_fine)
+   bfield_lrg = interpolate_3d_s(bfield, rho, rho_fine)
+   rjacob_lrg = interpolate_3d_s(rjacob, rho, rho_fine)
+   gsssup_lrg = interpolate_3d_s(gsssup, rho, rho_fine)
 
    !  Allocate arrays for fourier expansions etc
 

@@ -39,7 +39,7 @@ contains
    end function poly_eval
 
 
-   function interp_3d_s(in, s, s_fine) result(out)
+   function interpolate_3d_s(in, s, s_fine) result(out)
       ! use fitpack, only: curv1, curv2
       real(r8), intent(in) :: in(:,:,:), s(:), s_fine(:)
 
@@ -49,13 +49,13 @@ contains
 
       do i = 1, size(in, dim=1)
          do j = 1, size(in, dim=2)
-            out(i, j, :) = interp_wrap_rename(s, in(i, j, :), s_fine)
+            out(i, j, :) = interpolate_using_spline(s, in(i, j, :), s_fine)
          end do
       end do
-   end function interp_3d_s
+   end function interpolate_3d_s
 
 
-   function interp_wrap_rename(x, y, x_int) result(out)
+   function interpolate_using_spline(x, y, x_int) result(out)
       use fitpack, only: curv1, curv2
 
       real(r8), intent(in) :: x(:), y(size(x)), x_int(:)
@@ -71,7 +71,7 @@ contains
       end do
       if (ierr .ne. 0) write (*, '("spline error 1",i3)') ierr
 
-   end function interp_wrap_rename
+   end function interpolate_using_spline
 
 
    subroutine write_tmp(a, b)
