@@ -55,15 +55,14 @@ target_compile_definitions(xstgap_snd PRIVATE -D${SERIAL})
 target_compile_options(xstgap_snd PRIVATE -cpp -P -C -O2 -ffree-form)
 
 # XSTGAP_NEW
-set(XSTGAP_NEW_SRC "src/stellgap_ver5_new.f90")
+set(XSTGAP_NEW_SRC "src/stellgap/stellgap_ver5_new.f90")
 set_source_files_properties(
   ${XSTGAP_NEW_SRC}
   PROPERTIES Fortran_PREPROCESS ON
 )
-set(MODULES_SRC "src/constants.f90" "src/fourier_lib.f90" "src/fourier_lib_convolve.f90"
-  "src/post_process.f90" "src/fitpack.f90" "src/read_input.f90" "src/output.f90"
-  "src/globals.f90" "src/helper.f90" "src/eig_solver.f90")
-add_executable(xstgap_new ${XSTGAP_NEW_SRC} ${MODULES_SRC})
+set(MODULES_COMMON "src/common/constants.f90" "src/common/fourier_lib.f90" "src/common/fourier_lib_convolve.f90" "src/common/fitpack.f90" "src/common/helper.f90")
+set(MODULES_STELLGAP  "src/stellgap/post_process.f90"  "src/stellgap/read_input.f90" "src/stellgap/output.f90" "src/stellgap/globals.f90"  "src/stellgap/eig_solver.f90")
+add_executable(xstgap_new ${XSTGAP_NEW_SRC} ${MODULES_COMMON} ${MODULES_STELLGAP})
 target_include_directories(xstgap_new PRIVATE ${NETCDF_PATH})
 target_link_libraries(xstgap_new lapack blas m pthread netcdff)
 target_compile_definitions(xstgap_new PRIVATE -D${SERIAL})
