@@ -43,7 +43,6 @@ contains
 
    subroutine eigenvalue_solver
       use globals, only: ipos_def_sym, mn_col, subset_eq, iopt, jobz
-      ! real(r8) :: beta
       real(r8) :: egl, egu, abstol
       integer :: il, iu, info
       egl = 1.d-2
