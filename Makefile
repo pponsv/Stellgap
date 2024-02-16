@@ -1,6 +1,6 @@
 .PHONY : build
 
-all: clean configure build_all rmlink link
+all: configure build_all rmlink link
 
 link:
 	mkdir -p $${HOME}/.local/bin/

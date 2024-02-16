@@ -67,3 +67,12 @@ target_include_directories(xstgap_new PRIVATE ${NETCDF_PATH})
 target_link_libraries(xstgap_new lapack blas m pthread netcdff)
 target_compile_definitions(xstgap_new PRIVATE -D${SERIAL})
 target_compile_options(xstgap_new PRIVATE -cpp -P -C -O3 -ffree-form)
+
+# XMETRIC_NEW
+set(MODULES_COMMON "src/common/constants.f90")
+set(MODULES_METRIC "src/metric/read_input.f90")
+set(XMETRIC_SRC "src/metric/metric_element_create.f90" ${MODULES_COMMON} ${MODULES_METRIC})
+add_executable(xmetric_new ${XMETRIC_SRC})
+target_include_directories(xmetric_new PRIVATE ${LIBSTELL_PATH})
+target_link_directories(xmetric_new PRIVATE ${LIBSTELL_PATH})
+target_link_libraries(xmetric_new libstell netcdf lapack blas)
