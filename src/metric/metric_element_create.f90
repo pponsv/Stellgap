@@ -1,10 +1,5 @@
 program metric_element_create
 
-   use read_boozer_mod, only : nfp_b, ns_b, aspect_b, &
-      rmax_b, rmin_b, betaxis_b, mnboz_b, iota_b, pres_b, phip_b, bvco_b, &
-      buco_b, ixm_b, ixn_b, bmnc_b, rmnc_b, zmns_b, pmns_b, &
-      read_boozer_deallocate
-
    use constants
    use globals
    use read_input
@@ -45,10 +40,9 @@ program metric_element_create
    &thetang, zetang, det, error, rjac2_avg, det_avg, &
    &zboo, phiboo, xr, yr, zr
    INTEGER :: i, j, k, mn, kz, kt, ks
-   real(r8) :: b0, ohs2, mat_test_diag, mat_test_offdiag
-   character arg1*40, warg1*45, bozout*45
+   real(r8) :: ohs2, mat_test_diag, mat_test_offdiag
    integer nznt
-   integer istat, ierr, ig, lf, is
+   integer istat, ig, lf
    real surf_area_element, surf_area_total
 !-----------------------------------------------
 
@@ -77,9 +71,7 @@ program metric_element_create
       open (unit = 12, file = "cart_coords", status = "unknown")
       open (unit = 14, file = "metrics", status = "unknown")
    end if
-!       open(unit=15,file="ae_metric.dat",status="unknown")
-   open (unit = 15, file = "ae_metric.dat", &
-   &status = "unknown")
+   open (unit = 15, file = "ae_metric.dat", status = "unknown")
 
 
 
