@@ -74,22 +74,22 @@ contains
       use globals, only: rmncbh, zmnsbh, pmnsbh, bmncbh
       use globals, only : xm, xn
 
-      allocate (hiota(nsd))
-      allocate (hpres(nsd))
-      allocate (hjpol(nsd))
-      allocate (hjtor(nsd))
-      allocate (hphip(nsd))
+      ! allocate (hiota(nsd))
+      ! allocate (hpres(nsd))
+      ! allocate (hjpol(nsd))
+      ! allocate (hjtor(nsd))
+      ! allocate (hphip(nsd))
       allocate (jprl_coef0(nsd))
       allocate (jprl_coef1(nsd))
       allocate (jprl_coef2(nsd))
 
-      allocate (xm(mnboz))
-      allocate (xn(mnboz))
+      ! allocate (xm(mnboz))
+      ! allocate (xn(mnboz))
 
-      allocate (rmncbh(mnboz, nsd))
-      allocate (zmnsbh(mnboz, nsd))
-      allocate (pmnsbh(mnboz, nsd))
-      allocate (bmncbh(mnboz, nsd))
+      ! allocate (rmncbh(mnboz, nsd))
+      ! allocate (zmnsbh(mnboz, nsd))
+      ! allocate (pmnsbh(mnboz, nsd))
+      ! allocate (bmncbh(mnboz, nsd))
 
    end subroutine allocate_nsd_mnboz
 
