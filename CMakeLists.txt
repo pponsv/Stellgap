@@ -61,7 +61,7 @@ set_source_files_properties(
   PROPERTIES Fortran_PREPROCESS ON
 )
 set(MODULES_COMMON "src/common/constants.f90" "src/common/fourier_lib.f90" "src/common/fourier_lib_convolve.f90" "src/common/fitpack.f90" "src/common/helper.f90")
-set(MODULES_STELLGAP  "src/stellgap/post_process.f90"  "src/stellgap/read_input.f90" "src/stellgap/output.f90" "src/stellgap/globals.f90"  "src/stellgap/eig_solver.f90")
+set(MODULES_STELLGAP "src/stellgap/post_process.f90" "src/stellgap/read_input.f90" "src/stellgap/output.f90" "src/stellgap/globals.f90" "src/stellgap/eig_solver.f90")
 add_executable(xstgap_new ${XSTGAP_NEW_SRC} ${MODULES_COMMON} ${MODULES_STELLGAP})
 target_include_directories(xstgap_new PRIVATE ${NETCDF_PATH})
 target_link_libraries(xstgap_new lapack blas m pthread netcdff)
@@ -70,7 +70,7 @@ target_compile_options(xstgap_new PRIVATE -cpp -P -C -O3 -ffree-form)
 
 # XMETRIC_NEW
 set(MODULES_COMMON "src/common/constants.f90")
-set(MODULES_METRIC "src/metric/read_input.f90")
+set(MODULES_METRIC "src/metric/read_input.f90" "src/metric/output.f90" "src/metric/globals.f90")
 set(XMETRIC_SRC "src/metric/metric_element_create.f90" ${MODULES_COMMON} ${MODULES_METRIC})
 add_executable(xmetric_new ${XMETRIC_SRC})
 target_include_directories(xmetric_new PRIVATE ${LIBSTELL_PATH})

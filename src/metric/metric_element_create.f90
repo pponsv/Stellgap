@@ -13,39 +13,27 @@ program metric_element_create
    implicit none
 
 !-----------------------------------------------
-!   L o c a l   P a r a m e t e r s
-!-----------------------------------------------
-   real(r8), parameter :: ZERO = 0.0_r8
-   real(r8), parameter :: p5 = 0.5_r8
-   real(r8), parameter :: ONE = 1.0_r8
-   real(r8), parameter :: TWO = 2.0_r8
-!-----------------------------------------------
 !   L o c a l   V a r i a b l e s
 !-----------------------------------------------
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: hiota, hpres, &
-   &hphip, hjtor, hjpol
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: iotaf, jpolf, &
+
+   real(r8), dimension(:), ALLOCATABLE :: iotaf, jpolf, &
    &jtorf, phipf, presf
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: iotapf, jpolpf, &
+   real(r8), dimension(:), ALLOCATABLE :: iotapf, jpolpf, &
    &jtorpf, phippf, prespf
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: xmb, xnb, xm, xn
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: radii, radii_flux
-   REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncbf, zmnsbf, &
+   real(r8), dimension(:), ALLOCATABLE :: xmb, xnb
+   real(r8), dimension(:), ALLOCATABLE :: radii, radii_flux
+   real(r8), dimension(:, :), ALLOCATABLE :: rmncbf, zmnsbf, &
    &pmnsbf, bmncbf
-   REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncpbf, zmnspbf, &
+   real(r8), dimension(:, :), ALLOCATABLE :: rmncpbf, zmnspbf, &
    &pmnspbf, bmncpbf
-   REAL(r8), DIMENSION(:, :), ALLOCATABLE :: rmncbh, zmnsbh, &
-   &pmnsbh, bmncbh
-   REAL(r8), DIMENSION(:, :), ALLOCATABLE :: bfield, &
+   real(r8), dimension(:, :), ALLOCATABLE :: bfield, &
    &bfields, bfieldze, bfieldth, rjacob, rjacobze, rjacobth, &
    &rjacobs, gsssup, gttsup, gzzsup, gstsup, &
    &gszsup, gtzsup, brho
-   REAL(r8), DIMENSION(:), ALLOCATABLE :: jprl_coef0, &
-   &jprl_coef1, jprl_coef2
-   REAL(r8), DIMENSION(3, 3) :: mat_lowr
-   REAL(r8), DIMENSION(3, 3) :: mat_upr
-   REAL(r8), DIMENSION(3, 3) :: mat_diag
-   integer :: nsurf
+
+   real(r8), dimension(3, 3) :: mat_lowr
+   real(r8), dimension(3, 3) :: mat_upr
+   real(r8), dimension(3, 3) :: mat_diag
    real(r8) :: phipc, iotac, jtorc, jpolc, &
    &presc, prespc, jtorpc, jpolpc, phippc, iotapc
    real(r8) :: phis, phize, phith, rboo, rs, &
@@ -56,34 +44,29 @@ program metric_element_create
    &den1, cka, beta, t1, t2, t3, t4, t5, cks, &
    &thetang, zetang, det, error, rjac2_avg, det_avg, &
    &zboo, phiboo, xr, yr, zr
-   INTEGER :: nfp, nsd, mnboz, i, j, k, mn, kz, kt, ks
-   REAL(r8) :: r0, b0, amin, beta0, r0max, r0min, &
-   &aspect, betaxis, ohs2, mat_test_diag, mat_test_offdiag
+   INTEGER :: i, j, k, mn, kz, kt, ks
+   real(r8) :: b0, ohs2, mat_test_diag, mat_test_offdiag
    character arg1*40, warg1*45, bozout*45
-   character*1 tb
-   integer nargs, numargs, itheta, izeta, nznt
-   integer iargc, unit_no, istat, ierr, ig, lf, is
-   real viz_flux   !for plotting interior flux surfaces in AVS
+   integer nznt
+   integer istat, ierr, ig, lf, is
    real surf_area_element, surf_area_total
-   logical lasym, viz, test_jacob, test_upr_lowr, &
-      make_stellgap_data, make_full_torus, surf_compute
 !-----------------------------------------------
-   tb = char(9); itheta = 80; izeta = 80; viz = .true.
-   viz_flux = 0.5   !selects surface for AVS data - sync with metric_element_create.f
-   test_jacob = .false.
-   test_upr_lowr = .false.
-   make_stellgap_data = .true.
-   make_full_torus = .true.
-   surf_compute = .true.
+
 
    call read_args_and_boozer
 
-   ! numargs = iargc()
-   ! call getarg(1, arg1)
-   ! if (numargs .ne. 1) then
-   !    print *, ' MUST ENTER FILE SUFFIX ON COMMAND LINE'
-   !    stop
-   ! end if
+   if (surf_compute) then
+      write (47, *) nfp, izeta, itheta
+   end if
+
+   write (*, '(///)')
+   write (*, *) nfp, nsd
+   write (*, '(/)')
+   write (*, *) mnboz
+   write (*, '(/)')
+   write (*, *) r0, amin, beta0
+
+
    if (surf_compute) then
       open (unit = 47, file = "surf_area_elements", status = "unknown")
    end if
@@ -97,78 +80,10 @@ program metric_element_create
 !       open(unit=15,file="ae_metric.dat",status="unknown")
    open (unit = 15, file = "ae_metric.dat", &
    &status = "unknown")
-!
-!
-   ! warg1 = arg1
-!      write(*,*) warg1
-!      call read_wout_file(warg1,ierr)
-   ! call read_boozer_file(warg1, ierr)
-   ! if (istat .ne. 0) stop 22
 
-   nfp = nfp_b
-   nsd = ns_b
-   aspect = aspect_b
-   r0max = rmax_b
-   r0min = rmin_b
-   betaxis = betaxis_b
-   mnboz = mnboz_b
-!
-   if (surf_compute) then
-      write (47, *) nfp, izeta, itheta
-   end if
-!
-!...   IOTA, PRES, PHIP (= -PHIP_VMEC), JTOR (=I = -BUCO_VMEC) and
-!         JPOL (=J = BVCO_VMEC) are ALL on HALF-MESH!!!
 
-   allocate (hiota(nsd), hpres(nsd), hjpol(nsd), hjtor(nsd), &
-   &hphip(nsd), jprl_coef0(nsd), jprl_coef1(nsd), &
-   &jprl_coef2(nsd), stat = istat)
-   if (istat .ne. 0) stop 23
-   do k = 1, nsd
-      hiota(k) = iota_b(k)
-      hpres(k) = mu_0 * pres_b(k)  ! in VMEC versions > 6.00 pressure is given in pascals
-      hphip(k) = -phip_b(k)        ! toroidal fluxes have REVERSED sign respect to VMEC!!
-      hjpol(k) = bvco_b(k)
-      hjtor(k) = -buco_b(k)        ! toroidal fluxes have REVERSED sign respect to VMEC!!
-      !       write(*,'(i4,5(2x,e12.5))') k,hiota(k),hpres(k),hphip(k),
-      !     1     hjpol(k),hjtor(k)
-   end do
-   r0 = (r0max + r0min) / TWO
-   amin = r0 / aspect
-   beta0 = betaxis
-!       if (beta0 .le. ZERO) stop 'Beta0 <= 0'
-!       b0 = sqrt((TWO/beta0)*(1.5_dp*hpres(2)-.5_dp*hpres(3)))
-   write (*, '(///)')
-   write (*, *) nfp, nsd, aspect
-   write (*, '(/)')
-   write (*, *) r0max, r0min, betaxis, mnboz
-   write (*, '(/)')
-   write (*, *) r0, amin, beta0
 
-   allocate (xm(mnboz), xn(mnboz), stat = istat)
-   if (istat .ne. 0) stop 24
-   do mn = 1, mnboz
-      xm(mn) = ixm_b(mn)
-      xn(mn) = ixn_b(mn)
-      !       write(*,*) mn,xm(mn),xn(mn)
-   end do
-!...   RMN, ZMN, PMN and BMN are ALL on HALF-MESH
 
-   allocate (rmncbh(mnboz, nsd), zmnsbh(mnboz, nsd), &
-   &pmnsbh(mnboz, nsd), bmncbh(mnboz, nsd), stat = istat)
-   if (istat .ne. 0) stop 25
-
-   zmnsbh = ZERO; rmncbh = ZERO; pmnsbh = ZERO; bmncbh = ZERO
-
-   do k = 1, nsd
-      do mn = 1, mnboz
-         bmncbh(mn, k) = bmnc_b(mn, k)
-         rmncbh(mn, k) = rmnc_b(mn, k)
-         zmnsbh(mn, k) = zmns_b(mn, k)
-         pmnsbh(mn, k) = pmns_b(mn, k)
-      end do
-   end do
-   call read_boozer_deallocate
    allocate (radii(nsd), radii_flux(nsd), stat = istat)
    do i = 1, nsd
       radii(i) = sqrt(real(i - 1, r8) / (nsd - 1))     !  r/a= (radii_flux)**1/2
@@ -191,11 +106,11 @@ program metric_element_create
 
    iotaf = ZERO; presf = ZERO; jtorf = ZERO; jpolf = ZERO; phipf = ZERO
 
-   iotaf(2:nsd - 1) = p5 * (hiota(2:nsd - 1) + hiota(3:nsd))
-   presf(2:nsd - 1) = p5 * (hpres(2:nsd - 1) + hpres(3:nsd))
-   jtorf(2:nsd - 1) = p5 * (hjtor(2:nsd - 1) + hjtor(3:nsd))
-   jpolf(2:nsd - 1) = p5 * (hjpol(2:nsd - 1) + hjpol(3:nsd))
-   phipf(2:nsd - 1) = p5 * (hphip(2:nsd - 1) + hphip(3:nsd))
+   iotaf(2:nsd - 1) = ONE_HALF * (hiota(2:nsd - 1) + hiota(3:nsd))
+   presf(2:nsd - 1) = ONE_HALF * (hpres(2:nsd - 1) + hpres(3:nsd))
+   jtorf(2:nsd - 1) = ONE_HALF * (hjtor(2:nsd - 1) + hjtor(3:nsd))
+   jpolf(2:nsd - 1) = ONE_HALF * (hjpol(2:nsd - 1) + hjpol(3:nsd))
+   phipf(2:nsd - 1) = ONE_HALF * (hphip(2:nsd - 1) + hphip(3:nsd))
 
 !...  Evaluate and store surface quantities derivatives on RADIAL full mesh
 
@@ -238,13 +153,13 @@ program metric_element_create
 
          !...   Boozer Fourier coefficients on RADIAL full mesh
 
-         rmncbf(mn, k) = p5 * (rmncbh(mn, k + 1)&
+         rmncbf(mn, k) = ONE_HALF * (rmncbh(mn, k + 1)&
          & + rmncbh(mn, k))
-         zmnsbf(mn, k) = p5 * (zmnsbh(mn, k + 1)&
+         zmnsbf(mn, k) = ONE_HALF * (zmnsbh(mn, k + 1)&
          & + zmnsbh(mn, k))
-         pmnsbf(mn, k) = p5 * (pmnsbh(mn, k + 1)&
+         pmnsbf(mn, k) = ONE_HALF * (pmnsbh(mn, k + 1)&
          & + pmnsbh(mn, k))
-         bmncbf(mn, k) = p5 * (bmncbh(mn, k + 1)&
+         bmncbf(mn, k) = ONE_HALF * (bmncbh(mn, k + 1)&
          & + bmncbh(mn, k))
 
          !...   Boozer Fourier coefficients radial derivatives on RADIAL full mesh
