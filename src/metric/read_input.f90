@@ -16,13 +16,13 @@ contains
       character(len=128) :: boozer_extension
 
       ! Check the number of command line arguments
-      if (iargc() .ne. 1) then
+      if (command_argument_count() .ne. 1) then
          print *, ' MUST ENTER FILE SUFFIX ON COMMAND LINE'
          stop
       end if
 
       ! Read the file suffix from the command line
-      call getarg(1, boozer_extension)
+      call get_command_argument(1, boozer_extension)
 
       ! Read the boozer file
       call read_boozer_file(boozer_extension, ierr)
