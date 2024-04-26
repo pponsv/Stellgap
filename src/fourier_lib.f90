@@ -31,7 +31,7 @@ module fourier_lib
 contains
 !
    subroutine readin
-      open (unit=20, file="fourier.dat", status="old")
+      open (unit=20, file="./stgap_in/fourier.dat", status="old")
       read (20, *) nfp, ith, izt, mode_family
       mpol = ith*2/5; ntor = izt*2/5 ! Done to avoid aliasing issues
       nznt = ith*izt; mnmx = (2*ntor + 1)*mpol - ntor

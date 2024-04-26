@@ -16,10 +16,10 @@ contains
       integer :: nang2, irads, iopt, m_emax, n_emax,&
       &itot, isym_pos, istat, ir, i
       pi = 4.*atan(1.d0)
-      open (unit=4, file="alfven_spec", status="old")
-      open (unit=7, file="alfven_post", status="unknown")
-      open (unit=9, file="cond_no", status="unknown")
-      open (unit=8, file="data_post", status="old")
+      open (unit=4, file="./stgap_out/alfven_spec", status="old")
+      open (unit=7, file="./stgap_out/alfven_post", status="unknown")
+      open (unit=9, file="./stgap_out/cond_no", status="unknown")
+      open (unit=8, file="./stgap_out/data_post", status="old")
       read (8, *) iopt, nang2, irads, isym_pos
 !           if positive-definite matrix option is used in stellgap
 !            (subroutine DSYGV) then isym_pos = 1
@@ -105,12 +105,12 @@ contains
       &itot, m_emax_psi, n_emax_psi, isym_pos, istat,&
       &ir, i
       pi = 4.*atan(1.d0)
-      call system("rm all_alfven_spec")
-      call system("cat alfven_spec* > all_alfven_spec")
-      open (unit=4, file="all_alfven_spec", status="old")
-      open (unit=7, file="alfven_post", status="unknown")
-      open (unit=9, file="cond_no", status="unknown")
-      open (unit=8, file="data_post", status="old")
+      call system("rm ./stgap_out/all_alfven_spec")
+      call system("cat ./stgap_out/alfven_spec* > all_./stgap_out/alfven_spec")
+      open (unit=4, file="./stgap_out/all_alfven_spec", status="old")
+      open (unit=7, file="./stgap_out/alfven_post", status="unknown")
+      open (unit=9, file="./stgap_out/cond_no", status="unknown")
+      open (unit=8, file="./stgap_out/data_post", status="old")
       read (8, *) iopt, nang2, irads, isym_pos
 !        if positive-definite matrix option is used in stellgap
 !         (subroutine DSYGV) then isym_pos = 1

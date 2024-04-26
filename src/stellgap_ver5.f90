@@ -192,7 +192,7 @@ program tae_continua
    integer :: ldvl, ldvr, lwork, info, nn, m_red
    integer, allocatable :: ifail(:), iwork(:)
    logical :: cyl, lrfp
-   character*20 outfile
+   character*60 outfile
    character*3 procnum
    character*1 jobz
    character*10 date, time, zone
@@ -222,7 +222,7 @@ program tae_continua
    &tempi(irad3), stat=istat)
 
    nion = 0.   ! Initialize to avoid random values if input too short
-   open (unit=4, file="plasma.dat", status="old")
+   open (unit=4, file="./stgap_in/plasma.dat", status="old")
    read (4, plasma_input)
    print *, "NION", nion
    close (unit=4)
@@ -255,11 +255,12 @@ program tae_continua
 #if defined (PARALLEL)
    write (procnum, '(i3)') mype
    write (*, *) procnum
-   outfile = "alfven_spec"//trim(adjustl(procnum))
+   outfile = "./stgap_out/alfven_spec"//trim(adjustl(procnum))
 #endif
 #if defined (SERIAL)
-   outfile = "alfven_spec"
+   outfile = "./stgap_out/alfven_spec"
 #endif
+   write (*, *) outfile
    if (mype .eq. 0) then
       write (*, *) mype, npes
       write (*, *) procnum
@@ -325,15 +326,15 @@ program tae_continua
 !      write(*,*) trim(adjustl(outfile))
 
    open (unit=21, file=trim(adjustl(outfile)), status="unknown")
-   open (unit=8, file="coef_arrays", status="unknown")
+   open (unit=8, file="./stgap_out/coef_arrays", status="unknown")
    if (mype .eq. 0) then
-      open (unit=7, file="data_post", status="unknown")
-      open (unit=9, file="ion_profile", status="unknown")
+      open (unit=7, file="./stgap_out/data_post", status="unknown")
+      open (unit=9, file="./stgap_out/ion_profile", status="unknown")
    end if
 !
 !    Boozer coordinates input - new ae-mode-structure input
 !
-   open (unit=20, file="tae_data_boozer", status="old")
+   open (unit=20, file="./xmetric/tae_data_boozer", status="old")
 !      read(20,'(L)') lrfp    !uncomment and remove next line if lrfp added to tae_data_boozer
    lrfp = .false.
    if (lrfp) write (*, '("Using RFP settings")')
@@ -369,7 +370,7 @@ program tae_continua
 !    Record equilibrium and eigenfunction Fourier mode list
 !
    if (mype .eq. 0) then
-      open (unit=22, file="modes", status="unknown")
+      open (unit=22, file="./stgap_out/modes", status="unknown")
       write (22, '("Equilibrium modes:",/)')
       write (22, '("meq    neq")')
       do i = 1, mnmx
@@ -417,7 +418,7 @@ program tae_continua
       end if
 
       mu0_rho_ion(irr) = mu0*mass_ion*ion_density_0&
-                        &*ion_density(irr)*scale_khz
+      &*ion_density(irr)*scale_khz
       va = sqrt(bfavg**2/(mu0_rho_ion(irr)/scale_khz))
       if (mype .eq. 0)&
       &write (9, 67) r_pt, ion_density_0*ion_density(irr),&

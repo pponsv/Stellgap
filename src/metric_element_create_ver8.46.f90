@@ -93,18 +93,20 @@ if (numargs .ne. 1) then
    print *, ' MUST ENTER FILE SUFFIX ON COMMAND LINE'
    stop
 end if
+
+call system('mkdir -p xmetric')
 if (surf_compute) then
-   open (unit=47, file="surf_area_elements", status="unknown")
+   open (unit=47, file="./xmetric/surf_area_elements", status="unknown")
 end if
 if (make_stellgap_data) then
-   open (unit=20, file="tae_data_boozer", status="unknown")
+   open (unit=20, file="./xmetric/tae_data_boozer", status="unknown")
 end if
 if (viz) then
-   open (unit=12, file="cart_coords", status="unknown")
-   open (unit=14, file="metrics", status="unknown")
+   open (unit=12, file="./xmetric/cart_coords", status="unknown")
+   open (unit=14, file="./xmetric/metrics", status="unknown")
 end if
-!       open(unit=15,file="ae_metric.dat",status="unknown")
-open (unit=15, file="ae_metric.dat",&
+!       open(unit=15,file="./xmetric/ae_metric.dat",status="unknown")
+open (unit=15, file="./xmetric/ae_metric.dat",&
 &status="unknown")
 !
 !
@@ -394,7 +396,7 @@ flux_surface: do ks = 2, nsd - 1
          if (ks .eq. nsd - 1 .and. surf_compute) then
             surf_area_element = sqrt(gttsub*gzzsub - gtzsub*gtzsub)
             surf_area_total = surf_area_total + surf_area_element&
-                             &*(twopi**2)/(dble(itheta - 1)*dble(izeta - 1))
+            &*(twopi**2)/(dble(itheta - 1)*dble(izeta - 1))
             write (47, '(3e16.8)') zetang, thetang, surf_area_element
          end if
 
@@ -452,7 +454,7 @@ flux_surface: do ks = 2, nsd - 1
 
          beta = (gstsup(lf, ks)*jtorc - gszsup(lf, ks)*jpolc)/gsssup(lf, ks)
          t1 = iotapc*jtorc + iotac*jtorpc - jpolpc + (phippc/phipc)&
-             &*(iotac*jtorc - jpolc)
+         &*(iotac*jtorc - jpolc)
          t2 = 2.0_dp*prespc/phipc
          t3 = -(iotac*jtorc - jpolc)*rjacobs(lf, ks)
          t4 = -beta*iotac*rjacobth(lf, ks)
@@ -539,7 +541,7 @@ if (make_full_torus) then
 !       ks = nsd - 2
    ks = (nsd - 1)*viz_flux
 !       ks = 0.2*nsd
-   open (unit=17, file="full_torus_coords", status="unknown")
+   open (unit=17, file="./xmetric/full_torus_coords", status="unknown")
    do kz = 1, izeta
       do kt = 1, itheta
          thetang = twopi*dble(kt - 1)/dble(itheta - 1)
@@ -562,7 +564,7 @@ if (make_full_torus) then
       end do
    end do
 
-   open (unit=18, file="torus_slice_coords", status="unknown")
+   open (unit=18, file="./xmetric/torus_slice_coords", status="unknown")
    write (*, *) nsd - 2, itheta
 !       do is = 2,6
 !        ks = is*is
