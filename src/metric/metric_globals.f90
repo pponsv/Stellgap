@@ -1,4 +1,4 @@
-module globals
+module metric_globals
 
    use constants
 
@@ -29,4 +29,4 @@ module globals
 
 contains
 
-end module globals
+end module metric_globals

@@ -1,7 +1,7 @@
 program metric_element_create
 
    use constants
-   use globals
+   use metric_globals
    use read_input
 !
 !
@@ -96,13 +96,13 @@ program metric_element_create
    &phipf(nsd), stat = k)
    if (k .ne. 0) stop 'Allocation error'
 
-   iotaf = ZERO; presf = ZERO; jtorf = ZERO; jpolf = ZERO; phipf = ZERO
+   iotaf = 0.0_r8; presf = 0.0_r8; jtorf = 0.0_r8; jpolf = 0.0_r8; phipf = 0.0_r8
 
-   iotaf(2:nsd - 1) = ONE_HALF * (hiota(2:nsd - 1) + hiota(3:nsd))
-   presf(2:nsd - 1) = ONE_HALF * (hpres(2:nsd - 1) + hpres(3:nsd))
-   jtorf(2:nsd - 1) = ONE_HALF * (hjtor(2:nsd - 1) + hjtor(3:nsd))
-   jpolf(2:nsd - 1) = ONE_HALF * (hjpol(2:nsd - 1) + hjpol(3:nsd))
-   phipf(2:nsd - 1) = ONE_HALF * (hphip(2:nsd - 1) + hphip(3:nsd))
+   iotaf(2:nsd - 1) = 0.5_r8 * (hiota(2:nsd - 1) + hiota(3:nsd))
+   presf(2:nsd - 1) = 0.5_r8 * (hpres(2:nsd - 1) + hpres(3:nsd))
+   jtorf(2:nsd - 1) = 0.5_r8 * (hjtor(2:nsd - 1) + hjtor(3:nsd))
+   jpolf(2:nsd - 1) = 0.5_r8 * (hjpol(2:nsd - 1) + hjpol(3:nsd))
+   phipf(2:nsd - 1) = 0.5_r8 * (hphip(2:nsd - 1) + hphip(3:nsd))
 
 !...  Evaluate and store surface quantities derivatives on RADIAL full mesh
 
@@ -110,7 +110,7 @@ program metric_element_create
    &phippf(nsd), prespf(nsd), stat = k)
    if (k .ne. 0) stop 'Allocation error in get_ballooning_grate'
 
-   iotapf = ZERO; prespf = ZERO; jtorpf = ZERO; jpolpf = ZERO; phippf = ZERO
+   iotapf = 0.0_r8; prespf = 0.0_r8; jtorpf = 0.0_r8; jpolpf = 0.0_r8; phippf = 0.0_r8
 
 !      ohs2 = 2.0_dp*dble(nsd-1)                       ! ds to differentiate on RADIAL half mesh
    ohs2 = dble(nsd - 1)                                            ! 2 comes from interpolating to radial FULL mesh
@@ -138,20 +138,20 @@ program metric_element_create
       bmncpbf(mnboz, nsd), stat = k)
    if (k .ne. 0) stop 'Allocation error'
 
-   rmncbf = ZERO; zmnsbf = ZERO; pmnsbf = ZERO; bmncbf = ZERO
-   rmncpbf = ZERO; zmnspbf = ZERO; pmnspbf = ZERO; bmncpbf = ZERO
+   rmncbf = 0.0_r8; zmnsbf = 0.0_r8; pmnsbf = 0.0_r8; bmncbf = 0.0_r8
+   rmncpbf = 0.0_r8; zmnspbf = 0.0_r8; pmnspbf = 0.0_r8; bmncpbf = 0.0_r8
    do mn = 1, mnboz
       do k = 1, nsd - 1
 
          !...   Boozer Fourier coefficients on RADIAL full mesh
 
-         rmncbf(mn, k) = ONE_HALF * (rmncbh(mn, k + 1)&
+         rmncbf(mn, k) = 0.5_r8 * (rmncbh(mn, k + 1)&
          & + rmncbh(mn, k))
-         zmnsbf(mn, k) = ONE_HALF * (zmnsbh(mn, k + 1)&
+         zmnsbf(mn, k) = 0.5_r8 * (zmnsbh(mn, k + 1)&
          & + zmnsbh(mn, k))
-         pmnsbf(mn, k) = ONE_HALF * (pmnsbh(mn, k + 1)&
+         pmnsbf(mn, k) = 0.5_r8 * (pmnsbh(mn, k + 1)&
          & + pmnsbh(mn, k))
-         bmncbf(mn, k) = ONE_HALF * (bmncbh(mn, k + 1)&
+         bmncbf(mn, k) = 0.5_r8 * (bmncbh(mn, k + 1)&
          & + bmncbh(mn, k))
 
          !...   Boozer Fourier coefficients radial derivatives on RADIAL full mesh
@@ -211,20 +211,20 @@ program metric_element_create
             thetang = TWOPI * dble(kt - 1) / dble(itheta - 1)
             zetang = TWOPI * dble(kz - 1) / (dble(nfp) * dble(izeta - 1))
             !...   initialize for Fourier inversion
-            bfield(lf, ks) = ZERO
-            bfieldze(lf, ks) = ZERO
-            bfields(lf, ks) = ZERO
-            bfieldth(lf, ks) = ZERO
-            phis = ZERO
-            phize = ONE              ! since Phi_cyl  =  Phi_VMEC  = Phi_BOOZ + Pmn
-            phith = ZERO
-            rboo = ZERO; zboo = ZERO; phiboo = ZERO
-            rs = ZERO
-            rze = ZERO
-            rth = ZERO
-            zs = ZERO
-            zze = ZERO
-            zth = ZERO
+            bfield(lf, ks) = 0.0_r8
+            bfieldze(lf, ks) = 0.0_r8
+            bfields(lf, ks) = 0.0_r8
+            bfieldth(lf, ks) = 0.0_r8
+            phis = 0.0_r8
+            phize = 1.0_r8              ! since Phi_cyl  =  Phi_VMEC  = Phi_BOOZ + Pmn
+            phith = 0.0_r8
+            rboo = 0.0_r8; zboo = 0.0_r8; phiboo = 0.0_r8
+            rs = 0.0_r8
+            rze = 0.0_r8
+            rth = 0.0_r8
+            zs = 0.0_r8
+            zze = 0.0_r8
+            zth = 0.0_r8
 
             fourier : do j = 1, mnboz             ! Fourier invert B, R, Z, Phi and derivatives
 
@@ -259,8 +259,8 @@ program metric_element_create
             num2 = (iotac * jtorc - jpolc) * phippc + (iotapc * jtorc + &
             &iotac * jtorpc - jpolpc) * phipc
 
-            ibf2 = ONE / bfield(lf, ks)**2
-            ibf3 = -TWO / bfield(lf, ks)**3
+            ibf2 = 1.0_r8 / bfield(lf, ks)**2
+            ibf3 = -2.0_r8 / bfield(lf, ks)**3
 
             !...   Jacobian from cylindrical to Boozer  !note: this is sqrt(g), not 1/sqrt(g)
 
@@ -271,7 +271,7 @@ program metric_element_create
 
             rboo2 = rboo**2
             rjac2 = rjacob(lf, ks)**2
-            rjac2i = ONE / rjac2
+            rjac2i = 1.0_r8 / rjac2
 
             !...   Boozer lower metric elements
 
@@ -343,7 +343,7 @@ program metric_element_create
 
             !...   Boozer geodesic curvature
 
-            den1 = TWO * (iotac * jtorc - jpolc) * rjacob(lf, ks)
+            den1 = 2.0_r8 * (iotac * jtorc - jpolc) * rjacob(lf, ks)
             cka = (jpolc * rjacobth(lf, ks) + jtorc * rjacobze(lf, ks)) / den1
 
             !...   Boozer normal curvature
@@ -351,7 +351,7 @@ program metric_element_create
             beta = (gstsup(lf, ks) * jtorc - gszsup(lf, ks) * jpolc) / gsssup(lf, ks)
             t1 = iotapc * jtorc + iotac * jtorpc - jpolpc + (phippc / phipc)&
             & * (iotac * jtorc - jpolc)
-            t2 = TWO * prespc / phipc
+            t2 = 2.0_r8 * prespc / phipc
             t3 = -(iotac * jtorc - jpolc) * rjacobs(lf, ks)
             t4 = -beta * iotac * rjacobth(lf, ks)
             t5 = -beta * rjacobze(lf, ks)

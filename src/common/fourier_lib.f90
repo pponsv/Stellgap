@@ -180,9 +180,7 @@ contains
    !
    subroutine ccc(result, i, j, k)
       integer, intent(in) :: i, j, k
-      real(r8), parameter :: zero = 0, one = 1, &
-      &two = 2, four = 4
-      real(r8) :: result
+      real(8), intent(out) :: result
       integer :: izeros
       !
       !     This subroutine calculates the 1D integral of
@@ -190,44 +188,17 @@ contains
       !     for x running from 0 to 2*PI.
       !     The value returned is actually (2/PI) times this integral.
       !
-      result = zero
-      izeros = 0
-      if (i .eq. 0) izeros = izeros + 1
-      if (j .eq. 0) izeros = izeros + 1
-      if (k .eq. 0) izeros = izeros + 1
-      if (izeros .ne. 0) then
-         if (izeros .eq. 3) then
-            result = four
-            return
-         else if (izeros .eq. 2) then
-            result = zero
-            return
-         else if (izeros .eq. 1) then
-            if (i .eq. 0) then
-               result = zero
-               if (j * j .eq. k * k) then
-                  result = two
-               end if
-               return
-            else if (j .eq. 0) then
-               result = zero
-               if (i * i .eq. k * k) then
-                  result = two
-               end if
-               return
-            else if (k .eq. 0) then
-               result = zero
-               if (i * i .eq. j * j) then
-                  result = two
-               end if
-               return
-            end if
+      izeros = sum(merge(1, 0, (/ i, j, k/) .eq. 0))
+
+      result = 0
+      if (izeros .eq. 3) then
+         result = 4
+      else if (izeros .eq. 1) then
+         if ((abs(i) .eq. abs(j)) .or. (abs(j) .eq. abs(k)) .or. (abs(k) .eq. abs(i))) then
+            result = 2
          end if
       else if (izeros .eq. 0) then
-         if (k .eq. (i - j)) result = one
-         if (k .eq. (i + j)) result = one
-         if (k .eq. (j - i)) result = one
-         if (k .eq. -(i + j)) result = one
+         if ((abs(k) .eq. abs(i - j)) .or. (abs(k) .eq. abs(i+j))) result = 1
       end if
    end subroutine ccc
    !
@@ -235,29 +206,21 @@ contains
    !
    subroutine css(result, k, i, j)
       integer, intent(in) :: i, j, k
-      real(r8), parameter :: one = 1, neg_one = -1, zero = 0, &
-      &two = 2, neg_two = -2
-      real(r8) :: result
+      real(8) :: result
       !
       !     This subroutine calculates the 1D integral of
       !     cos(k*x)*sin(i*x)*sin(j*x)
       !     for x running from 0 to 2*PI.
       !     The value returned is actually (2/PI) times this integral.
       !
-      result = zero
+      result = 0
       if (i .eq. 0 .or. j .eq. 0) return
       if (k .eq. 0) then
-         if (i * i .ne. j * j) then
-            return
-         else if (i * i .eq. j * j) then
-            result = 2
-            return
-         end if
+         if (abs(i) .eq. abs(j)) result=2
+         return
       end if
-      if (k .eq. (i - j)) result = one
-      if (k .eq. (i + j)) result = neg_one
-      if (k .eq. (j - i)) result = one
-      if (k .eq. -(i + j)) result = neg_one
+      if (abs(k) .eq. abs(i - j)) result = 1
+      if (abs(k) .eq. abs(i + j)) result = -1
    end subroutine css
    !
    !

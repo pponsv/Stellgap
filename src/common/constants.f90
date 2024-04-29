@@ -12,9 +12,4 @@ module constants
    real(r8), parameter :: PI = 4._r8 * atan(1._r8)
    real(r8), parameter :: TWOPI = 8._r8 * atan(1._r8)
 
-   real(r8), parameter :: ZERO = 0.0_r8
-   real(r8), parameter :: ONE_HALF = 0.5_r8
-   real(r8), parameter :: ONE = 1.0_r8
-   real(r8), parameter :: TWO = 2.0_r8
-
 end module constants

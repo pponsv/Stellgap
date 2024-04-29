@@ -8,10 +8,10 @@ module read_input
 contains
 
    subroutine read_args_and_boozer
-      use globals, only : nfp, nsd, amin, r0, beta0, mnboz
-      use globals, only : hiota, hpres, hjpol, hjtor, hphip
-      use globals, only : xm, xn
-      use globals, only : rmncbh, zmnsbh, pmnsbh, bmncbh
+      use metric_globals, only : nfp, nsd, amin, r0, beta0, mnboz
+      use metric_globals, only : hiota, hpres, hjpol, hjtor, hphip
+      use metric_globals, only : xm, xn
+      use metric_globals, only : rmncbh, zmnsbh, pmnsbh, bmncbh
       integer :: ierr
       character(len=128) :: boozer_extension
 
@@ -68,11 +68,11 @@ contains
    end subroutine read_args_and_boozer
 
    subroutine allocate_nsd_mnboz
-      use globals, only : nsd, mnboz
-      use globals, only : hiota, hpres, hjpol, hjtor, hphip, jprl_coef0, &
+      use metric_globals, only : nsd, mnboz
+      use metric_globals, only : hiota, hpres, hjpol, hjtor, hphip, jprl_coef0, &
          jprl_coef1, jprl_coef2
-      use globals, only: rmncbh, zmnsbh, pmnsbh, bmncbh
-      use globals, only : xm, xn
+      use metric_globals, only: rmncbh, zmnsbh, pmnsbh, bmncbh
+      use metric_globals, only : xm, xn
 
       ! allocate (hiota(nsd))
       ! allocate (hpres(nsd))
