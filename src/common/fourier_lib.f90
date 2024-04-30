@@ -68,6 +68,7 @@ contains
       end do
    end subroutine trig_array
 
+
    subroutine convolution_array
       use globals, only: mn_col, ntors, mwl, mwu, rm_col, rn_col, im_col, in_col, nw
       integer :: istat, count, i, m, n
@@ -95,92 +96,63 @@ contains
       end do
       mn_col = count
    end subroutine convolution_array
-   !
-   !
+
+
    subroutine scs_convolve(ans, m1, n1, m2, n2, meq, neq)
+      real(r8), intent(out) :: ans
+      integer, intent(in) :: m1, m2, n1, n2, meq, neq
       real(r8) :: tht_int1, tht_int2, tht_int3, tht_int4, &
-      &zeta_int1, zeta_int2, zeta_int3, zeta_int4, ans
-      integer :: m1, m2, n1, n2, meq, neq
-      integer :: sm1, sm2, sn1, sn2, smeq, sneq
+         zeta_int1, zeta_int2, zeta_int3, zeta_int4
       !
       !     This subroutine calculates the 2D integral for tht and zeta running
       !     from 0 to 2*PI of:
       !     sin(m1*tht - n1*zeta)*cos(meq*tht - neq*zeta)*sin(m2*tht - n2*zeta)
       !     The value returned is actually (2/PI) times this integral.
       !
-      sm1 = 1; sm2 = 1; sn1 = 1; sn2 = 1; smeq = 1; sneq = 1
-      if (m1 .ne. 0) sm1 = m1 / abs(m1)
-      if (m2 .ne. 0) sm2 = m2 / abs(m2)
-      if (n1 .ne. 0) sn1 = n1 / abs(n1)
-      if (n2 .ne. 0) sn2 = n2 / abs(n2)
-      if (meq .ne. 0) smeq = meq / abs(meq)
-      if (neq .ne. 0) sneq = neq / abs(neq)
-      m1 = sm1 * m1; n1 = sn1 * n1
-      m2 = sm2 * m2; n2 = sn2 * n2
-      meq = smeq * meq; neq = sneq * neq
-      call css(tht_int1, meq, m1, m2)
-      call ccc(zeta_int1, n1, n2, neq)
-      call ccc(tht_int2, m1, m2, meq)
-      call css(zeta_int2, neq, n1, n2)
-      call css(tht_int3, m2, m1, meq)
-      call css(zeta_int3, n1, n2, neq)
-      call css(tht_int4, m1, m2, meq)
-      call css(zeta_int4, n2, n1, neq)
-      ans = tht_int1 * zeta_int1 * sm1 * sm2 &
-         + tht_int2 * zeta_int2 * sn1 * sn2 &
-         - tht_int3 * zeta_int3 * sm1 * smeq * sn2 * sneq &
-         - tht_int4 * zeta_int4 * sm2 * smeq * sn1 * sneq
-      m1 = sm1 * m1; n1 = sn1 * n1
-      m2 = sm2 * m2; n2 = sn2 * n2
-      meq = smeq * meq; neq = sneq * neq
+      call css(tht_int1, abs(meq), abs(m1), abs(m2))
+      call ccc(zeta_int1, abs(n1), abs(n2), abs(neq))
+      call ccc(tht_int2, abs(m1), abs(m2), abs(meq))
+      call css(zeta_int2, abs(neq), abs(n1), abs(n2))
+      call css(tht_int3, abs(m2), abs(m1), abs(meq))
+      call css(zeta_int3, abs(n1), abs(n2), abs(neq))
+      call css(tht_int4, abs(m1), abs(m2), abs(meq))
+      call css(zeta_int4, abs(n2), abs(n1), abs(neq))
+      ans = tht_int1 * zeta_int1 * sign(1, m1) * sign(1, m2) &
+         + tht_int2 * zeta_int2 * sign(1, n1) * sign(1, n2) &
+         - tht_int3 * zeta_int3 * sign(1, m1) * sign(1, meq) * sign(1, n2) * sign(1, neq) &
+         - tht_int4 * zeta_int4 * sign(1, m2) * sign(1, meq) * sign(1, n1) * sign(1, neq)
    end subroutine scs_convolve
-   !
-   !
-   !
+
+
    subroutine ccc_convolve(ans, m1, n1, m2, n2, meq, neq)
-      integer :: istat
+      integer, intent(in) :: m1, m2, n1, n2, meq, neq
+      real(r8), intent(out) :: ans
       real(r8) :: tht_int1, tht_int2, tht_int3, tht_int4, &
-      &zeta_int1, zeta_int2, zeta_int3, zeta_int4, ans
-      integer :: m1, m2, n1, n2, meq, neq
-      integer :: sm1, sm2, sn1, sn2, smeq, sneq
+         zeta_int1, zeta_int2, zeta_int3, zeta_int4
       !
       !     This subroutine calculates the 2D integral for tht and zeta running
       !     from 0 to 2*PI of:
       !     cos(m1*tht - n1*zeta)*cos(meq*tht - neq*zeta)*cos(m2*tht - n2*zeta)
       !     The value returned is actually (2/PI) times this integral.
       !
-      sm1 = 1; sm2 = 1; sn1 = 1; sn2 = 1; smeq = 1; sneq = 1
-      if (m1 .ne. 0) sm1 = m1 / abs(m1)
-      if (m2 .ne. 0) sm2 = m2 / abs(m2)
-      if (n1 .ne. 0) sn1 = n1 / abs(n1)
-      if (n2 .ne. 0) sn2 = n2 / abs(n2)
-      if (meq .ne. 0) smeq = meq / abs(meq)
-      if (neq .ne. 0) sneq = neq / abs(neq)
-      m1 = sm1 * m1; n1 = sn1 * n1
-      m2 = sm2 * m2; n2 = sn2 * n2
-      meq = smeq * meq; neq = sneq * neq
-      call ccc(tht_int1, m1, m2, meq)
-      call ccc(zeta_int1, n1, n2, neq)
-      call css(tht_int2, meq, m1, m2)
-      call css(zeta_int2, neq, n1, n2)
-      call css(tht_int3, m1, m2, meq)
-      call css(zeta_int3, n1, n2, neq)
-      call css(tht_int4, m2, m1, meq)
-      call css(zeta_int4, n2, n1, neq)
-      ans = tht_int1 * zeta_int1&
-         + tht_int2 * zeta_int2 * sm1 * sm2 * sn1 * sn2&
-         + tht_int3 * zeta_int3 * sm2 * smeq * sn2 * sneq&
-         + tht_int4 * zeta_int4 * sm1 * smeq * sn1 * sneq
-      m1 = sm1 * m1; n1 = sn1 * n1
-      m2 = sm2 * m2; n2 = sn2 * n2
-      meq = smeq * meq; neq = sneq * neq
+      call ccc(tht_int1, abs(m1), abs(m2), abs(meq))
+      call ccc(zeta_int1, abs(n1), abs(n2), abs(neq))
+      call css(tht_int2, abs(meq), abs(m1), abs(m2))
+      call css(zeta_int2, abs(neq), abs(n1), abs(n2))
+      call css(tht_int3, abs(m1), abs(m2), abs(meq))
+      call css(zeta_int3, abs(n1), abs(n2), abs(neq))
+      call css(tht_int4, abs(m2), abs(m1), abs(meq))
+      call css(zeta_int4, abs(n2), abs(n1), abs(neq))
+      ans = tht_int1 * zeta_int1 &
+         + tht_int2 * zeta_int2 * sign(1, m1) * sign(1, m2) * sign(1, n1) * sign(1, n2) &
+         + tht_int3 * zeta_int3 * sign(1, m2) * sign(1, meq) * sign(1, n2) * sign(1, neq) &
+         + tht_int4 * zeta_int4 * sign(1, m1) * sign(1, meq) * sign(1, n1) * sign(1, neq)
    end subroutine ccc_convolve
-   !
-   !
-   !
+
+
    subroutine ccc(result, i, j, k)
       integer, intent(in) :: i, j, k
-      real(8), intent(out) :: result
+      real(r8), intent(out) :: result
       integer :: izeros
       !
       !     This subroutine calculates the 1D integral of
@@ -201,12 +173,11 @@ contains
          if ((abs(k) .eq. abs(i - j)) .or. (abs(k) .eq. abs(i+j))) result = 1
       end if
    end subroutine ccc
-   !
-   !
-   !
+
+
    subroutine css(result, k, i, j)
       integer, intent(in) :: i, j, k
-      real(8) :: result
+      real(r8) :: result
       !
       !     This subroutine calculates the 1D integral of
       !     cos(k*x)*sin(i*x)*sin(j*x)
@@ -222,11 +193,6 @@ contains
       if (abs(k) .eq. abs(i - j)) result = 1
       if (abs(k) .eq. abs(i + j)) result = -1
    end subroutine css
-   !
-   !
-   ! subroutine trg_deallocate
-   !    deallocate (rm, rn, cos_ar, sin_ar, f, fnm, anm, &
-   !    &rm_col, rn_col, im_col, in_col)
-   ! end subroutine trg_deallocate
+
 
 end module fourier_lib
