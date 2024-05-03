@@ -37,7 +37,7 @@ contains
       zetas  = real_linspace_nolast(0._r8, 2*PI/nfp, izt)
       thetas = real_linspace_nolast(0._r8, 2*PI, ith)
       ztgrd  = pack(spread(zetas, dim=1, ncopies=ith), .true.)
-      thtgrd = pack(spread(zetas, dim=2, ncopies=ith), .true.)
+      thtgrd = pack(spread(thetas, dim=2, ncopies=izt), .true.)
 
       !    Generate Fourier mode distribution
       mn = 0
