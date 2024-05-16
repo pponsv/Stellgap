@@ -65,8 +65,8 @@ contains
       irads = 41
       ir_fine_scl = 128  !default values
 
-      call getarg(1, arg1)
-      call getarg(2, arg2)
+      call get_command_argument(1, arg1)
+      call get_command_argument(2, arg2)
 
       read (arg1, '(i3)') irads
       read (arg2, '(i4)') ir_fine_scl

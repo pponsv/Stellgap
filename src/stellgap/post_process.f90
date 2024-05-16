@@ -12,7 +12,7 @@ contains
       real(r8), allocatable, dimension(:) :: temp
       real(r8), allocatable, dimension(:,:) :: omega, alpha_r, alpha_i, beta, &
          omega_r, omega_i
-      complex*16, allocatable, dimension(:,:) :: omega2
+      complex(r8), allocatable, dimension(:,:) :: omega2
 
       open (unit=4, file="alfven_spec", status="old")
       open (unit=7, file="alfven_post", status="unknown")
@@ -58,12 +58,12 @@ contains
                      lam_max = max(lam_max, abs(lambda_real))
                   end if
                   lambda_imag = alpha_i(ir, i)/beta(ir, i)
-                  omega2(ir, i) = dcmplx(lambda_real, lambda_imag)
+                  omega2(ir, i) = cmplx(lambda_real, lambda_imag, kind=r8)
                else if (beta(ir, i) .le. 0.d0) then
                   omega2(ir, i) = 1.e+10
                end if
-               omega_r(ir, i) = real(cdsqrt(omega2(ir, i)))
-               omega_i(ir, i) = imag(cdsqrt(omega2(ir, i)))
+               omega_r(ir, i) = real(sqrt(omega2(ir, i)))
+               omega_i(ir, i) = cmplx(sqrt(omega2(ir, i)), kind=r8)
                if (omega_i(ir, i) .eq. 0.d0) then
                   if (r_pt .lt. 0.99) then
                      write (7, '(2(e15.7,2x),i4,2x,i4)') r_pt, omega_r(ir, i)*fnorm, &
@@ -89,12 +89,12 @@ contains
 
       real(r8), allocatable :: omega(:, :)
       real(r8), allocatable :: alpha_r(:, :), alpha_i(:, :), beta(:, :), omega_r(:, :), omega_i(:, :)
-      complex*16, allocatable :: omega2(:, :)
+      complex(r8), allocatable :: omega2(:, :)
       real(r8), allocatable :: temp(:)
       real(r8) :: r_pt, lam_min,lam_max, cond_no, lambda_real, xnrm,phi_norm, psi_norm, fnorm, lambda_imag
       integer :: nang2, irads, iopt, m_emax, n_emax, itot, m_emax_psi, n_emax_psi, isym_pos, istat, ir, i
-      call system("rm all_alfven_spec")
-      call system("cat alfven_spec* > all_alfven_spec")
+      call EXECUTE_COMMAND_LINE("rm all_alfven_spec")
+      call EXECUTE_COMMAND_LINE("cat alfven_spec* > all_alfven_spec")
       open (unit=4, file="all_alfven_spec", status="old")
       open (unit=7, file="alfven_post", status="unknown")
       open (unit=9, file="cond_no", status="unknown")
@@ -143,12 +143,12 @@ contains
                      lam_max = max(lam_max, abs(lambda_real))
                   end if
                   lambda_imag = alpha_i(ir, i)/beta(ir, i)
-                  omega2(ir, i) = dcmplx(lambda_real, lambda_imag)
+                  omega2(ir, i) = cmplx(lambda_real, lambda_imag, kind=r8)
                else if (beta(ir, i) .le. 0.d0) then
                   omega2(ir, i) = 1.e+10
                end if
-               omega_r(ir, i) = real(cdsqrt(omega2(ir, i)))
-               omega_i(ir, i) = imag(cdsqrt(omega2(ir, i)))
+               omega_r(ir, i) = real(sqrt(omega2(ir, i)))
+               omega_i(ir, i) = cmplx(sqrt(omega2(ir, i)), kind=r8)
                if (omega_i(ir, i) .eq. 0.d0) then
                   if (r_pt .lt. 0.99) then
                      write (7, '(2(e15.7,2x),i4,2x,i4,2(2x,e15.7))')&

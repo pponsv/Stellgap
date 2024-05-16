@@ -8,7 +8,7 @@ project(
     'warning_level=2',
     'default_library=static',
     'optimization=2',
-    'fortran_std=f2008',
+    'fortran_std=f2018',
   ],
 )
 fortran_compiler = meson.get_compiler('fortran')
@@ -27,22 +27,6 @@ stell = fortran_compiler.find_library(
   dirs: fs.expanduser('~/bin/libstell_dir/'),
 )
 
-# FORTRAN LIBRARY
-lib_stgap_common_src = files(
-  'src/common/constants.f90',
-  'src/common/fitpack.f90',
-  'src/common/fourier_lib.f90',
-  'src/common/fourier_lib_convolve.f90',
-  'src/common/helper.f90',
-)
-
-# lib_stgap_common = library(
-#   'stgap_common',
-#   lib_stgap_common_src,
-#   install: false,
-#   pic: true,
-# )
-
 include_dirs = include_directories(
   fs.expanduser('~/bin/libstell_dir/'),
   '/usr/include/',
@@ -60,5 +44,27 @@ xmetric = executable(
   ['src/metric/metric_element_create.f90', xmetric_files],
   include_directories: include_dirs,
   dependencies: xmetric_dependencies,
+  # link_with: [lib_stgap_common],
+)
+
+xstgap_dependencies = [netcdf, lapack, blas]
+xstgap_files = files(
+  'src/common/constants.f90',
+  'src/common/fitpack.f90',
+  'src/common/fourier_lib.f90',
+  'src/common/fourier_lib_convolve.f90',
+  'src/common/helper.f90',
+  'src/stellgap/eig_solver.f90',
+  'src/stellgap/globals.f90',
+  'src/stellgap/output.f90',
+  'src/stellgap/read_input.f90',
+  'src/stellgap/post_process.f90'
+)
+
+xstgap = executable(
+  'xstgap',
+  ['src/stellgap/stellgap_ver5_new.f90', xstgap_files],
+  include_directories: include_dirs,
+  dependencies: xstgap_dependencies,
   # link_with: [lib_stgap_common],
 )

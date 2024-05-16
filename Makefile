@@ -8,6 +8,9 @@ bld:
 configure: bld
 	meson setup --wipe bld
 
+compile: configure
+	meson compile -C bld
+
 install: configure
 	meson install -C bld
 	$(MAKE) link
