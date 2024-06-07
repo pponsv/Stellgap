@@ -10,7 +10,7 @@ contains
 
    subroutine read_tae_data_boozer
       use globals, only: izt, ith, irads, lrfp, rho, rho_fine, iotac, theta_tae, zeta_tae,&
-         rjacob, bfield, gsssup, bfavg, ir_fine_scl
+         rjacob, bfield, gsssup, bfavg, ir_fine_scl, tae_data_boozer_file
 
       integer :: ir, i, j, nn(irads), istat
       real(r8) :: dum1, dum2, dm1, dm2, dm3, dm4, dm5
@@ -25,7 +25,7 @@ contains
       allocate (theta_tae(ith), stat = istat)
       allocate (zeta_tae(izt), stat = istat)
 
-      open (unit=20, file="tae_data_boozer", status="old")
+      open (unit=20, file=tae_data_boozer_file, status="old")
 
       select case (lrfp)
        case (.true.)
@@ -58,18 +58,35 @@ contains
 
 
    subroutine read_args
-      use globals, only : irads, ir_fine_scl
+      use globals, only : irads, ir_fine_scl, tae_data_boozer_file, plasma_dat_file, fourier_dat_file
 
-      character*10 :: arg1, arg2
+      integer :: numargs
+      character*100 :: arg1, arg2, arg3, arg4, arg5
 
+      !default values
       irads = 41
-      ir_fine_scl = 128  !default values
+      ir_fine_scl = 128
+      tae_data_boozer_file = "./xmetric/tae_data_boozer"
+      plasma_dat_file = "./stgap_in/plasma.dat"
+      fourier_dat_file = "./stgap_in/fourier.dat"
 
-      call getarg(1, arg1)
-      call getarg(2, arg2)
+      numargs = command_argument_count()
 
-      read (arg1, '(i3)') irads
-      read (arg2, '(i4)') ir_fine_scl
+      call get_command_argument(1, arg1)
+      call get_command_argument(2, arg2)
+      call get_command_argument(3, arg3)
+      call get_command_argument(4, arg4)
+      call get_command_argument(5, arg5)
+
+      if (numargs .ge. 1) read (arg1, '(i3)') irads
+      if (numargs .ge. 2) read (arg2, '(i4)') ir_fine_scl
+      if (numargs .ge. 3) read (arg3, '(a)') fourier_dat_file
+      if (numargs .ge. 4) read (arg4, '(a)') plasma_dat_file
+      if (numargs .ge. 5) read (arg5, '(a)') tae_data_boozer_file
+
+      write (*, '("fourier_dat_file = ",a)') fourier_dat_file
+      write (*, '("plasma_dat_file = ",a)') plasma_dat_file
+      write (*, '("tae_data_boozer_file = ",a)') tae_data_boozer_file
 
       ! write (*, '("irads = ",i4," irads3 = ",i4," ir_fine_scl = ",i5)') irads, 3*irads, ir_fine_scl
 
@@ -77,7 +94,8 @@ contains
 
 
    subroutine read_plasma_dat
-      use globals, only: mass_ion, ion_density_0, ion_profile, nion, telec, aion, bion, cion
+      use globals, only: mass_ion, ion_density_0, ion_profile, nion, telec, aion, bion, cion, &
+         plasma_dat_file
 
       real(r8) :: ion_to_proton_mass
       logical :: jdqz_data       ! Useless, for compatibility with AE3D
@@ -90,7 +108,7 @@ contains
       nion = 0.
       telec = 0.
 
-      open (unit=4, file="plasma.dat", status="old")
+      open (unit=4, file=plasma_dat_file, status="old")
       read (4, plasma_input)
       close(4)
 
@@ -100,10 +118,11 @@ contains
 
 
    subroutine read_fourier_dat
-      use globals, only: nfp, ith, izt, ntors, nw, mwl, mwu, mpol, ntor, mnmx
+      use globals, only: nfp, ith, izt, ntors, nw, mwl, mwu, mpol, ntor, mnmx, &
+         fourier_dat_file
       integer :: i, istat, mode_family
 
-      open (unit=20, file="fourier.dat", status="old")
+      open (unit=20, file=fourier_dat_file, status="old")
       read (20, *) nfp, ith, izt, mode_family
       read (20, *) ntors
 

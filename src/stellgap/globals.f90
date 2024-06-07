@@ -19,6 +19,9 @@ module globals
    !  Command line input
    integer :: irads, ir_fine_scl
 
+   !  Input files
+   character(len=100) :: plasma_dat_file, fourier_dat_file, tae_data_boozer_file
+
    !  read_fourier_dat
    integer :: ith, izt, mpol, ntor, mnmx, ntors, nfp
    integer, allocatable, dimension(:) :: nw, mwl, mwu

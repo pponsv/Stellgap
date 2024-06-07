@@ -15,9 +15,6 @@ program tae_continua
 
    implicit none
 
-
-
-
    !!!!!!!  PRUEBAS
 
    real(r8), allocatable :: tmp(:)
@@ -44,10 +41,6 @@ program tae_continua
 
    !  START PROGRAM
 
-   ! cyl = .false.
-   ! lrfp = .false.
-   ! jobz = 'V'
-
    !  Read command-line arguments
    call read_args
 
@@ -67,29 +60,24 @@ program tae_continua
 
    call convolution_array
 
-
-   !
-   !   Open files for output
-   !
-   !      write(*,*) trim(adjustl(outfile))
-
    write (*, fmt='(10(A10,3x,i4,/))') "izt:", izt, "ith:", ith, "irads:", irads, &
       "irads3:", 3*irads,"mnmx:", mnmx, "ith*izt:", ith*izt, "mn_col:", mn_col, &
       "ir_fine:", ir_fine_scl, "mpol:", mpol, "ntor:", ntor
 
-
    !    Boozer coordinates input - new ae-mode-structure input
    call read_tae_data_boozer
 
+   !   Open files for output
+   call system('mkdir -p stellgap_out')
+   open (unit = 21, file = "./stellgap_out/alfven_spec", status = "unknown")
    !    Record equilibrium and eigenfunction Fourier mode list
    call write_modes
 
-   !
    !   Make spline fits and fill in fine_radius_scale arrays - TODO - MAKE FUNCTION
-   !
    iota_r = interpolate_using_spline(rho, iotac, rho_fine)
    iota_r_inv = interpolate_using_spline(rho, 1._r8/iotac, rho_fine) ! for lrfp .eq. .true.
 
+   !  Calculate ion density profile
    select case (ion_profile)
     case (0)
       ion_density = (iota_r / iotac(1))**2
@@ -100,7 +88,6 @@ program tae_continua
     case (3)
       ion_density = (1. - aion * (rho_fine**bion))**cion
    end select
-
    mu0_rho_ion = MU_0 * mass_ion * ion_density_0 * scale_khz * ion_density
 
    call write_ion_profile
@@ -111,8 +98,6 @@ program tae_continua
    gsssup_lrg = interpolate_3d_s(gsssup, rho, rho_fine)
 
    !  Allocate arrays for fourier expansions etc
-
-   ! allocate (eig_vect(mn_col), stat = istat)
    allocate (f1_nm(mnmx), stat = istat)
    allocate (f3a_nm(mnmx), stat = istat)
    allocate (f3b_nm(mnmx), stat = istat)
@@ -123,9 +108,7 @@ program tae_continua
    allocate (f3c(izt, ith), stat = istat)
    allocate (f2_nm(mnmx), stat = istat)   !PRUEBA
 
-
-   open (unit = 21, file = "alfven_spec", status = "unknown")
-
+   !  Initialize solver
    call initialize_solver
 
    f1_big = gsssup_lrg * rjacob_lrg / (bfield_lrg**2)
@@ -206,11 +189,10 @@ program tae_continua
 
       call write_output(ir)
 
-   end do       !ir=1,ir_fine_scl
-   !
-   !
-   close (unit = 21)
+   end do
 
+   !  Close files
+   close (unit = 21)
 
    !  Write and deallocate
    write (*, '(/,"modes = ",i5,2x,"no. of radial points = ",i5)') mn_col, ir_fine_scl
