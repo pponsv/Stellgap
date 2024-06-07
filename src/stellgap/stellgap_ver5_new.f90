@@ -68,8 +68,8 @@ program tae_continua
    call read_tae_data_boozer
 
    !   Open files for output
-   call system('mkdir -p stellgap_out')
-   open (unit = 21, file = "./stellgap_out/alfven_spec", status = "unknown")
+   call system('mkdir -p stgap_out')
+   open (unit = 21, file = "./stgap_out/alfven_spec", status = "unknown")
    !    Record equilibrium and eigenfunction Fourier mode list
    call write_modes
 
@@ -118,9 +118,9 @@ program tae_continua
    do ir = 1, ir_fine_scl
 
       !  Print percentage completed
-      if (modulo(ir, ir_fine_scl/10) .eq. 0) then
-         write(*,fmt='(1A1, i4, "%")', advance="no") char(13), 100*ir/ir_fine_scl
-      end if
+      ! if (modulo(ir, ir_fine_scl/10) .eq. 0) then
+      write(*,fmt='(1A1, i4, "%")', advance="no") char(13), 100*ir/ir_fine_scl
+      ! end if
 
       select case (lrfp)
        case (.true.)

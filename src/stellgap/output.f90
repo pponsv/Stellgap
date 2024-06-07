@@ -11,7 +11,7 @@ contains
 
       integer :: i
 
-      open (unit=22, file="./stellgap_out/modes", status="unknown")
+      open (unit=22, file="./stgap_out/modes", status="unknown")
 
       write (22, '("Equilibrium modes:",/)')
       write (22, '("meq    neq")')
@@ -37,7 +37,7 @@ contains
       real(r8) :: va
       integer :: irr
 
-      open (unit = 9, file = "./stellgap_out/ion_profile", status = "unknown")
+      open (unit = 9, file = "./stgap_out/ion_profile", status = "unknown")
 
       do irr=1, ir_fine_scl
          va = sqrt(bfavg**2 / (mu0_rho_ion(irr) / scale_khz))
@@ -56,7 +56,7 @@ contains
       if (ipos_def_sym) isym_opt = 1
       if (.NOT. ipos_def_sym) isym_opt = 0
 
-      open (unit = 7, file = "./stellgap_out/data_post", status = "unknown")
+      open (unit = 7, file = "./stgap_out/data_post", status = "unknown")
       write (7, '(i5,3(2x,i5))') iopt, mn_col, ir_fine_scl, isym_opt
       close (unit = 7)
 
@@ -68,7 +68,7 @@ contains
       real(r8), intent(in), dimension(mnmx) :: f1_nm, f3a_nm, f3b_nm, f3c_nm
       integer :: mn
 
-      open (unit = 8, file = "./stellgap_out/coef_arrays", status = "unknown")
+      open (unit = 8, file = "./stgap_out/coef_arrays", status = "unknown")
       do mn = 1, mnmx
          write (8, '(f6.1,2x,f6.1,4(2x,e15.7))') m_fourier(mn), n_fourier(mn), &
             f1_nm(mn), f3a_nm(mn), f3b_nm(mn), f3c_nm(mn)
@@ -145,7 +145,7 @@ contains
 
       integer :: ierr, file_id, id_meq, id_neq, id_meig, id_neig, id_rho
 
-      ierr = nf90_create(path='./stellgap_out/stellgap_out.nc', cmode=NF90_CLOBBER, ncid=file_id)
+      ierr = nf90_create(path='./stgap_out/stgap_out.nc', cmode=NF90_CLOBBER, ncid=file_id)
 
       id_meq = def_1d_var(m_fourier, file_id, name='m_eq', long_name='Equilibrium modes: m', &
          units='None', xlabel='m', data_type=NF90_INT)
