@@ -52,7 +52,28 @@ contains
       iu = 0
 
       if (ipos_def_sym .eqv. .false.) then
-         call dggev('N', 'V', mn_col, amat, mn_col, bmat, mn_col, alfr, alfi, beta, vl, mn_col, vr, mn_col, work, lwork, info)
+         ! Solve the generalized eigenvalue problem
+         ! A * x = lambda * B * x
+         ! where A and B are symmetric matrices and B is positive definite
+         ! x is the right eigenvector, lambda is the eigenvalue
+         call dggev('N', & ! No left eigenvectors
+            'V', &      ! Compute right eigenvectors
+            mn_col, &   ! Number of rows in matrices
+            amat, &     ! Matrix A
+            mn_col, &   ! Leading dimension of A (number of rows)
+            bmat, &     ! Matrix B
+            mn_col, &   ! Leading dimension of B (number of rows)
+            alfr, &     ! Real part of eigenvalues
+            alfi, &     ! Imaginary part of eigenvalues
+            beta, &     ! Beta - eigenvalues are (alfr + i*alfi) / beta
+            vl, &       ! Left eigenvectors - not computed
+            mn_col, &   ! Leading dimension of VL (number of rows)
+            vr, &       ! Right eigenvectors - computed, stored in columns
+            mn_col, &   ! Leading dimension of VR (number of rows)
+            work, &     ! Workspace array of size lwork
+            lwork, &    ! Length of work array
+            info, &     ! Output: 0 if successful
+            )
       else
          if (subset_eq .eqv. .false.) then
             call dsygv(iopt, jobz, 'L', mn_col, amat, mn_col, bmat, mn_col, omega, work, lwork, info)
